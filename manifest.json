@@ -1,0 +1,10 @@
+﻿{
+  "Name": "ValleyReminders",
+  "Author": "Dannode36",
+  "Version": "0.1.0",
+  "Description": "Never forget an important task ever again!",
+  "UniqueID": "Dannode36.ValleyReminders",
+  "EntryDll": "ValleyReminders.dll",
+  "MinimumApiVersion": "3.0.0",
+  "UpdateKeys": []
+}
