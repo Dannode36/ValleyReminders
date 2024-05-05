@@ -10,7 +10,9 @@ namespace ValleyReminders
 {
     static class Utilities
     {
-        public static IModHelper Helper;
+        internal static IModHelper Helper;
+
+        internal static IMonitor Monitor;
 
         public static void SaveReminders(List<Reminder> reminder, string key)
         {

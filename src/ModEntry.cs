@@ -12,11 +12,7 @@ namespace ValleyReminders
     {
         const string SAVE_KEY = "vr-reminderList";
 
-        public List<Reminder> activeReminders = new()
-        {
-            new("This is a reccuring alarm", 0, 1),
-            new("This is a reccuring alarm for 6:30am", 0, 1, 630)
-        };
+        public List<Reminder> activeReminders = new();
 
         readonly List<Reminder> deleteQueue = new();
 
@@ -28,9 +24,10 @@ namespace ValleyReminders
         public override void Entry(IModHelper helper)
         {
             Utilities.Helper = helper;
+            Utilities.Monitor = Monitor;
 
             helper.Events.GameLoop.TimeChanged += TimeChangedHandler;
-            helper.Events.GameLoop.SaveLoaded += SaveLoadedHandler;
+            helper.Events.GameLoop.DayStarted += DayStartedHandler;
             helper.Events.GameLoop.Saving += SavingHandler;
         }
 
@@ -47,11 +44,13 @@ namespace ValleyReminders
             }
 
             Utilities.SaveReminders(activeReminders, SAVE_KEY);
+            Monitor.Log("Reminders saved", LogLevel.Info);
         }
 
-        private void SaveLoadedHandler(object? sender, SaveLoadedEventArgs e)
+        private void DayStartedHandler(object? sender, DayStartedEventArgs e)
         {
-            //activeReminders = Utilities.LoadReminders(SAVE_KEY);
+            activeReminders = Utilities.LoadReminders(SAVE_KEY);
+            Monitor.Log("Reminders loaded", LogLevel.Info);
             ReminderLoop();
         }
 
@@ -62,7 +61,6 @@ namespace ValleyReminders
 
         private void ReminderLoop()
         {
-            Monitor.Log($"Reminder Loop. Time: {Game1.timeOfDay}", LogLevel.Info);
             //Update and notify reminders
             foreach (var reminder in activeReminders)
             {
