@@ -1,2 +1,2 @@
 # ValleyReminders
- Never forget an important task ever again
+ Never forget about any agricultural (or not) task again!
