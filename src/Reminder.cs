@@ -12,57 +12,65 @@ namespace ValleyReminders
     class Reminder
     {
         public string Message { get; set; } = string.Empty;
-        public int StartDay { get; set; } = 0;
-        public int Time { get; set; } = 600; //Only valid in increments of 10 in the range 600-2600
-        public int Interval { get; set; } = -1;
+        public int StartDay { get; set; }
+        public int Time { get; set; } //Only valid in increments of 10 in the range 600-2600
+        public int Interval { get; set; }
 
-        public List<ConditionData> conditions = new();
+        public List<ConditionData> Conditions = new();
 
         public Reminder() { }
 
-        public Reminder(string message, int startDay, int interval = -1, int time = 600)
+        public Reminder(string message, int startDay, int time = 600, int interval = -1, List<ConditionData>? conditions = null)
         {
             Message = message;
             StartDay = startDay;
             Time = time;
             Interval = interval;
+            Conditions = conditions ?? new();
         }
 
         public bool IsReadyToNotify()
         {
-            foreach (var condition in conditions)
+            foreach (var condition in Conditions)
             {
                 object?[] objects = { condition.Parameters };
                 object? result = typeof(Conditions).GetMethod(condition.MethodName)?.Invoke(this, objects);
-                
+
+                Utilities.Monitor.Log($"Condition ({condition.MethodName}) was {(bool?)result}");
+
                 if ((bool?)result == false) return false;
             }
 
-            if(Interval != -1) //Periodic reminder
+            if (SDate.Now().DaysSinceStart >= StartDay)
             {
-                if ((SDate.Now().DaysSinceStart >= StartDay) && (SDate.Now().DaysSinceStart - StartDay) % Interval == 0)
+                if (IsRecurring()) //Recurring reminder
+                {
+                    if ((SDate.Now().DaysSinceStart - StartDay) % Interval == 0)
+                    {
+                        return Game1.timeOfDay == Time;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else // One-shot reminder
                 {
                     return Game1.timeOfDay == Time;
                 }
-                else
-                {
-                    return false;
-                }
             }
-            else // One-shot reminder
-            {
-                return SDate.Now().DaysSinceStart == StartDay;
-            }
+            else return false;
         }
 
         public bool IsRecurring()
         {
-            return Interval != -1;
+            return Interval !< 1;
         }
 
         public void Notify()
         {
             Game1.addHUDMessage(new HUDMessage(Message, HUDMessage.newQuest_type));
+            Game1.playSound("detector");
         }
     }
 }

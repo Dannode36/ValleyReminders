@@ -12,7 +12,28 @@ namespace ValleyReminders
     {
         const string SAVE_KEY = "vr-reminderList";
 
-        public List<Reminder> activeReminders = new();
+        public List<Reminder> activeReminders = new()
+        {
+            new("This is a reccuring alarm for 6:10am", 0, 610),
+            new("This is a reflection strainer", 0, 620, 1, new()
+            {
+                new("IsDay", "8"),
+                new("IsSeason", "Spring"),
+                new("IsYear", "1"),
+            }),
+            new("This is a reflection strainer 2", 0, 630, 1, new()
+            {
+                new("IsDay", "8"),
+                new("IsSeason", "Spring"),
+                new("IsYear", "1"),
+            }),
+            new("This is a reflection strainer 3", 0, 640, 1, new()
+            {
+                new("IsDay", "8"),
+                new("IsSeason", "Spring"),
+                new("IsYear", "1"),
+            })
+        };
 
         readonly List<Reminder> deleteQueue = new();
 
@@ -29,14 +50,22 @@ namespace ValleyReminders
             helper.Events.GameLoop.TimeChanged += TimeChangedHandler;
             helper.Events.GameLoop.DayStarted += DayStartedHandler;
             helper.Events.GameLoop.Saving += SavingHandler;
+            helper.Events.GameLoop.SaveLoaded += SaveLoadedHandler;
         }
 
         /*********
         ** Private methods
         *********/
 
+        private void SaveLoadedHandler(object? sender, SaveLoadedEventArgs e)
+        {
+            activeReminders = Utilities.LoadReminders(SAVE_KEY);
+            Monitor.Log("Reminders loaded!", LogLevel.Info);
+        }
+
         private void SavingHandler(object? sender, SavingEventArgs e)
         {
+            Monitor.Log($"Removing {deleteQueue.Count} expired reminders", LogLevel.Info);
             //Delete expired reminders before writing to save
             foreach (var expiredReminder in deleteQueue)
             {
@@ -44,13 +73,11 @@ namespace ValleyReminders
             }
 
             Utilities.SaveReminders(activeReminders, SAVE_KEY);
-            Monitor.Log("Reminders saved", LogLevel.Info);
+            Monitor.Log("Reminders saved!", LogLevel.Info);
         }
 
         private void DayStartedHandler(object? sender, DayStartedEventArgs e)
         {
-            activeReminders = Utilities.LoadReminders(SAVE_KEY);
-            Monitor.Log("Reminders loaded", LogLevel.Info);
             ReminderLoop();
         }
 
@@ -67,14 +94,10 @@ namespace ValleyReminders
                 if (reminder.IsReadyToNotify())
                 {
                     reminder.Notify();
+                    Monitor.Log($"Reminder notified: {reminder.Message}", LogLevel.Info);
 
-                    if (reminder.IsRecurring())
+                    if (!reminder.IsRecurring())
                     {
-                        Monitor.Log($"Recurring reminder notified for day {reminder.StartDay}: {reminder.Message}", LogLevel.Info);
-                    }
-                    else
-                    {
-                        Monitor.Log($"Reminder notified for day {reminder.StartDay}: {reminder.Message}", LogLevel.Info);
                         deleteQueue.Add(reminder);
                     }
                 }

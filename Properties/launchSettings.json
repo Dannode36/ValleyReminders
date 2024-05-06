@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "ValleyReminders": {
+      "commandName": "Project"
+    },
+    "SMAPI": {
+      "commandName": "Executable",
+      "executablePath": "D:\\SteamLibrary\\steamapps\\common\\Stardew Valley\\StardewModdingAPI.exe",
+      "workingDirectory": "D:\\SteamLibrary\\steamapps\\common\\Stardew Valley"
+    }
+  }
+}
