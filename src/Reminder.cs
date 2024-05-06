@@ -9,12 +9,14 @@ using System.Threading.Tasks;
 
 namespace ValleyReminders
 {
-    class Reminder : IReminder
+    class Reminder
     {
         public string Message { get; set; } = string.Empty;
         public int StartDay { get; set; } = 0;
         public int Time { get; set; } = 600; //Only valid in increments of 10 in the range 600-2600
         public int Interval { get; set; } = -1;
+
+        public List<ConditionData> conditions = new();
 
         public Reminder() { }
 
@@ -28,6 +30,14 @@ namespace ValleyReminders
 
         public bool IsReadyToNotify()
         {
+            foreach (var condition in conditions)
+            {
+                object?[] objects = { condition.Parameters };
+                object? result = typeof(Conditions).GetMethod(condition.MethodName)?.Invoke(this, objects);
+                
+                if ((bool?)result == false) return false;
+            }
+
             if(Interval != -1) //Periodic reminder
             {
                 if ((SDate.Now().DaysSinceStart >= StartDay) && (SDate.Now().DaysSinceStart - StartDay) % Interval == 0)

@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace ValleyReminders
 {
-    interface IReminder
+    class ConditionData
     {
-        bool IsReadyToNotify();
-        bool IsRecurring();
-        void Notify();
+        public string MethodName { get; set; } = string.Empty;
+        public List<string> Parameters { get; set; } = new();
     }
 }
