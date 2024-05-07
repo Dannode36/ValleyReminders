@@ -48,6 +48,7 @@ namespace ValleyReminders.ui
             {
                 Checked = !Checked;
                 Callback.Invoke(this);
+                Console.WriteLine("Checkbox clicked");
             }
         }
 

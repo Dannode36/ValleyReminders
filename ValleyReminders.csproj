@@ -11,4 +11,14 @@
     <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="4.1.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="assets\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="assets\button.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using StardewModdingAPI.Utilities;
 using StardewValley;
 using StardewValley.Menus;
 using System;
@@ -15,48 +16,67 @@ namespace ValleyReminders
     {
         private List<Reminder> reminders = new();
 
-        readonly RootElement rootElement = new();
+        private RootElement rootElement = new();
 
         public void CreateInterface(List<Reminder> reminders)
         {
+            this.reminders = reminders;
+            initialize((Game1.uiViewport.Width / 2) - 500, (Game1.uiViewport.Height / 2) - 500, 1000, 800, true);
+            UpdateInterface();
+        }
+
+        public void UpdateInterface()
+        {
+            rootElement = new();
+
             Table table = new()
             {
                 RowHeight = 100,
-                Size = new(1000, 1000),
-                LocalPosition = new(Game1.viewportCenter.X, Game1.viewportCenter.Y)
+                Size = new(height, width),
+                LocalPosition = new((Game1.uiViewport.Width / 2f) - 400, (Game1.uiViewport.Height / 2f) - 400)
             };
-            List<Element> row1 = new()
-            {
-                new Checkbox(),
-                new Label() { String = "Reminders Enabled", LocalPosition = new (new Checkbox().Width + 10, 0)}
-            };
-            table.AddRow(row1.ToArray());
 
-            //Reminders
-            Table reminderTable = new(false)
             {
-                RowHeight = 20,
-                Size = new(800, 500),
-                LocalPosition = new (Position.X + 100, Position.Y)
-            };
-            foreach (Reminder reminder in reminders)
-            {
-                List<Element> reminderData = new()
+                var checkBox = new Checkbox()
                 {
-                    new Textbox()
-                    {
-                        String = reminder.Message,
-                        LocalPosition = new(Position.X , Position.Y)
-                    }
+                    Callback = (e) => { }
                 };
-                reminderTable.AddRow(reminderData.ToArray());
+                var label = new Label() { String = "Reminders Enabled", LocalPosition = new(checkBox.Width + 10, 0) };
+                table.AddRow(new Element[] { checkBox, label });
             }
 
-            List<Element> row2 = new()
             {
-                reminderTable
-            };
-            table.AddRow(row2.ToArray());
+                var button = new Button(Utilities.Helper.ModContent.Load<Texture2D>(Utilities.Button))
+                {
+                    Callback = (e) => { reminders.Clear(); UpdateInterface(); }
+                };
+                var label = new Label() { String = "Clear Reminders" };
+
+                table.AddRow(new Element[] { button, label });
+            }
+
+            {
+                //Reminders
+                Table reminderTable = new(false)
+                {
+                    RowHeight = 20,
+                    Size = new(600, 500),
+                    LocalPosition = new(100, 0)
+                };
+
+                foreach (Reminder reminder in reminders)
+                {
+                    var textBox = new Label()
+                    {
+                        String = reminder.Message,
+                        Font = Game1.smallFont
+                        //LocalPosition = new(Position.X, Position.Y)
+                    };
+                    reminderTable.AddRow(new Element[] { textBox });
+                }
+
+                table.AddRow(new Element[] { reminderTable });
+            }
 
             rootElement.AddChild(table);
         }
@@ -75,6 +95,11 @@ namespace ValleyReminders
         public override void draw(SpriteBatch b)
         {
             rootElement.Draw(b);
+
+            if (shouldDrawCloseButton())
+            {
+                upperRightCloseButton.draw(b);
+            }
             drawMouse(b);
         }
     }
