@@ -1,14 +1,10 @@
-﻿using Microsoft.VisualBasic.FileIO;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using StardewValley;
 using StardewValley.Menus;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using ValleyReminders.ui;
 
 using Textbox = ValleyReminders.ui.Textbox;
@@ -19,16 +15,6 @@ namespace ValleyReminders
     {
         private List<Reminder> reminders = new();
 
-        private List<ClickableComponent> labels = new List<ClickableComponent>();
-
-        /// <summary>The season buttons to draw.</summary>
-        private List<ClickableTextureComponent> seasonButtons = new List<ClickableTextureComponent>();
-
-        /// <summary>The day buttons to draw.</summary>
-        private List<ClickableTextureComponent> dayButtons = new List<ClickableTextureComponent>();
-
-        OptionsCheckbox option = new("Enable Reminders", 10);
-
         readonly RootElement rootElement = new();
 
         public void CreateInterface(List<Reminder> reminders)
@@ -36,12 +22,13 @@ namespace ValleyReminders
             Table table = new()
             {
                 RowHeight = 100,
-                Size = new(1000, 1000)
+                Size = new(1000, 1000),
+                LocalPosition = new(Game1.viewportCenter.X, Game1.viewportCenter.Y)
             };
             List<Element> row1 = new()
             {
                 new Checkbox(),
-                new Label() { String = "Reminders Enabled", LocalPosition = new (20, 0)}
+                new Label() { String = "Reminders Enabled", LocalPosition = new (new Checkbox().Width + 10, 0)}
             };
             table.AddRow(row1.ToArray());
 
@@ -50,13 +37,17 @@ namespace ValleyReminders
             {
                 RowHeight = 20,
                 Size = new(800, 500),
-                LocalPosition = new (20, 0)
+                LocalPosition = new (Position.X + 100, Position.Y)
             };
             foreach (Reminder reminder in reminders)
             {
                 List<Element> reminderData = new()
                 {
-                    new Textbox() { String = reminder.Message, }
+                    new Textbox()
+                    {
+                        String = reminder.Message,
+                        LocalPosition = new(Position.X , Position.Y)
+                    }
                 };
                 reminderTable.AddRow(reminderData.ToArray());
             }
@@ -68,7 +59,6 @@ namespace ValleyReminders
             table.AddRow(row2.ToArray());
 
             rootElement.AddChild(table);
-            rootElement.LocalPosition = new(Game1.viewportCenter.X, Game1.viewportCenter.Y);
         }
 
         public override void update(GameTime time)
@@ -80,12 +70,6 @@ namespace ValleyReminders
         public override void receiveLeftClick(int x, int y, bool playSound = true)
         {
             base.receiveLeftClick(x, y, playSound);
-
-            if (option.bounds.Contains(x, y))
-            {
-                option.receiveLeftClick(x, y);
-                Game1.playSound("shwip");
-            }
         }
 
         public override void draw(SpriteBatch b)

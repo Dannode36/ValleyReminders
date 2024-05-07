@@ -90,7 +90,7 @@ namespace ValleyReminders
 
         private void OnSaveLoaded(object? sender, SaveLoadedEventArgs e)
         {
-            activeReminders = Utilities.LoadReminders(SAVE_KEY);
+            //activeReminders = Utilities.LoadReminders(SAVE_KEY);
             Monitor.Log("Reminders loaded!", LogLevel.Info);
 
             menu.CreateInterface(activeReminders);
