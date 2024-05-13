@@ -15,7 +15,6 @@ namespace ValleyReminders.ui
         /// <summary>Whether to update the <see cref="Children"/> when <see cref="Update"/> is called.</summary>
         protected bool UpdateChildren { get; set; } = true;
 
-
         /*********
         ** Accessors
         *********/
@@ -37,8 +36,7 @@ namespace ValleyReminders.ui
             }
         }
 
-        public Element[] Children => this.ChildrenImpl.ToArray();
-
+        public Element[] Children => ChildrenImpl.ToArray();
 
         /*********
         ** Public methods
@@ -46,7 +44,7 @@ namespace ValleyReminders.ui
         public void AddChild(Element element)
         {
             element.Parent?.RemoveChild(element);
-            this.ChildrenImpl.Add(element);
+            ChildrenImpl.Add(element);
             element.Parent = this;
         }
 
@@ -54,34 +52,34 @@ namespace ValleyReminders.ui
         {
             if (element.Parent != this)
                 throw new ArgumentException("Element must be a child of this container.");
-            this.ChildrenImpl.Remove(element);
+            ChildrenImpl.Remove(element);
             element.Parent = null;
         }
 
         /// <inheritdoc />
-        public override void Update(bool isOffScreen = false)
+        public override void HandleLeftClick(int x, int y)
         {
-            base.Update(isOffScreen);
-            if (this.UpdateChildren)
+            base.HandleLeftClick(x, y);
+            if (UpdateChildren)
             {
                 foreach (var element in this.ChildrenImpl)
-                    element.Update(isOffScreen);
+                    element.HandleLeftClick(x, y);
             }
         }
 
         /// <inheritdoc />
         public override void Draw(SpriteBatch b)
         {
-            if (this.IsHidden())
+            if (IsHidden())
                 return;
 
-            foreach (var child in this.ChildrenImpl)
+            foreach (var child in ChildrenImpl)
             {
-                if (child == this.RenderLast)
+                if (child == RenderLast)
                     continue;
                 child.Draw(b);
             }
-            this.RenderLast?.Draw(b);
+            RenderLast?.Draw(b);
         }
     }
 }

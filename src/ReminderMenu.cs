@@ -24,6 +24,11 @@ namespace ValleyReminders
             initialize((Game1.uiViewport.Width / 2) - 500, (Game1.uiViewport.Height / 2) - 500, 1000, 800, true);
             UpdateInterface();
         }
+        public override void performHoverAction(int x, int y)
+        {
+            base.performHoverAction(x, y);
+            rootElement.OnHover(x, y);
+        }
 
         public void UpdateInterface()
         {
@@ -90,6 +95,12 @@ namespace ValleyReminders
         public override void receiveLeftClick(int x, int y, bool playSound = true)
         {
             base.receiveLeftClick(x, y, playSound);
+            rootElement.HandleLeftClick(x, y);
+        }
+
+        public override void releaseLeftClick(int x, int y)
+        {
+            base.releaseLeftClick(x, y);
         }
 
         public override void draw(SpriteBatch b)

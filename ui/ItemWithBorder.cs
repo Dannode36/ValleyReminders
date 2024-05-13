@@ -32,7 +32,7 @@ namespace ValleyReminders.ui
         {
             base.Update( hidden );
 
-            if ( Hover )
+            if ( Hovered )
                 HoveredElement = this;
             else if ( HoveredElement == this )
                 HoveredElement = null;
@@ -43,7 +43,7 @@ namespace ValleyReminders.ui
 
             bool SecondaryClickGestured = (Game1.input.GetMouseState().RightButton == ButtonState.Pressed && Game1.oldMouseState.RightButton == ButtonState.Released);
             SecondaryClickGestured = SecondaryClickGestured || (Game1.options.gamepadControls && (Game1.input.GetGamePadState().IsButtonDown(Buttons.B) && !Game1.oldPadState.IsButtonDown(Buttons.B)));
-            if (Hover && SecondaryClickGestured && SecondaryCallback != null)
+            if (Hovered && SecondaryClickGestured && SecondaryCallback != null)
                 SecondaryCallback.Invoke(this);
         }
 

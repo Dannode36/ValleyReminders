@@ -48,7 +48,7 @@ namespace ValleyReminders.ui
         {
             base.Update(isOffScreen);
 
-            Scale = Hover ? Math.Min(Scale + 0.013f, 1.083f) : Math.Max(Scale - 0.013f, 1f);
+            Scale = Hovered ? Math.Min(Scale + 0.013f, 1.083f) : Math.Max(Scale - 0.013f, 1f);
 
             if (Clicked)
                 Callback?.Invoke(this);
@@ -60,7 +60,7 @@ namespace ValleyReminders.ui
             if (IsHidden())
                 return;
 
-            var texRect = Hover ? HoverTextureRect : IdleTextureRect;
+            var texRect = Hovered ? HoverTextureRect : IdleTextureRect;
             Vector2 origin = new(texRect.Width / 2f, texRect.Height / 2f);
             b.Draw(Texture, Position + origin, texRect, Color.White, 0f, origin, Scale, SpriteEffects.None, 0f);
             Game1.activeClickableMenu?.drawMouse(b);

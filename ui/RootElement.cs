@@ -31,7 +31,7 @@ namespace ValleyReminders.ui
         }
 
         /// <inheritdoc />
-        internal override RootElement GetRootImpl()
+        internal override RootElement GetRootInternal()
         {
             return this;
         }

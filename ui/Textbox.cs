@@ -65,7 +65,7 @@ namespace ValleyReminders.ui
 
             if (this.ClickGestured && this.Callback != null)
             {
-                this.Selected = this.Hover;
+                this.Selected = this.Hovered;
             }
         }
 
