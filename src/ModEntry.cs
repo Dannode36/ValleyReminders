@@ -47,17 +47,26 @@ namespace ValleyReminders
         public override void Entry(IModHelper helper)
         {
             Config = helper.ReadConfig<ModConfig>();
-
             Utilities.Helper = helper;
             Utilities.Monitor = Monitor;
+
+            //Get the names of all reminder condition functions available to the user at runtime
+            Conditions.validCondFuncNames = typeof(Conditions)
+                .GetMethods()
+                .Where(x => x.ReturnType == typeof(bool) && x.IsStatic)
+                .Select(x => x.Name)
+                .ToList();
 
             helper.Events.GameLoop.TimeChanged += OnTimeChanged;
             helper.Events.GameLoop.DayStarted += OnDayStarted;
             helper.Events.GameLoop.Saving += OnSaving;
             helper.Events.GameLoop.SaveLoaded += OnSaveLoaded;
-            helper.Events.Display.RenderedActiveMenu += OnRenderedActiveMenu;
-            helper.Events.Input.ButtonsChanged += OnButtonsChanged;
             helper.Events.GameLoop.UpdateTicked += OnUpdateTicker;
+
+            helper.Events.Display.RenderedActiveMenu += OnRenderedActiveMenu;
+
+            helper.Events.Input.ButtonsChanged += OnButtonsChanged;
+            helper.Events.Input.MouseWheelScrolled += OnMouseWheelScrolled;
         }
 
         /*********
@@ -66,7 +75,7 @@ namespace ValleyReminders
 
         private void OnUpdateTicker(object? sender, UpdateTickedEventArgs e)
         {
-            if(Game1.hasLoadedGame)
+            if (Game1.hasLoadedGame && Game1.activeClickableMenu is ReminderMenu menu)
             {
                 menu.update(Game1.currentGameTime);
             }
@@ -74,9 +83,17 @@ namespace ValleyReminders
 
         private void OnButtonsChanged(object? sender, ButtonsChangedEventArgs e)
         {
-            if (Config.ToggleKey.JustPressed())
+            if (Game1.hasLoadedGame && Config.ToggleKey.JustPressed())
             {
                 Game1.activeClickableMenu = menu;
+            }
+        }
+
+        private void OnMouseWheelScrolled(object? sender, MouseWheelScrolledEventArgs e)
+        {
+            if (Game1.hasLoadedGame && Game1.activeClickableMenu is ReminderMenu menu)
+            {
+                menu.receiveScrollWheelAction(e.Delta);
             }
         }
 

@@ -2,6 +2,7 @@ using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
+using StardewValley.Menus;
 
 namespace ValleyReminders.ui
 {
@@ -17,16 +18,20 @@ namespace ValleyReminders.ui
         ** Accessors
         *********/
         public Texture2D Texture { get; set; }
-        public Rectangle IdleTextureRect { get; set; }
-        public Rectangle HoverTextureRect { get; set; }
+        public Rectangle TextureRect { get; set; } = Rectangle.Empty;
+
+        public Color IdleTint { get; set; }
+        public Color HoverTint { get; set; }
 
         public Action<Element>? Callback { get; set; }
 
-        /// <inheritdoc />
-        public override int Width => this.IdleTextureRect.Width;
+        public Vector2 Size { get; set; }
 
         /// <inheritdoc />
-        public override int Height => this.IdleTextureRect.Height;
+        public override int Width => (int)Size.X;
+
+        /// <inheritdoc />
+        public override int Height => (int)Size.Y;
 
         /// <inheritdoc />
         public override string HoveredSound => "Cowboy_Footstep";
@@ -36,11 +41,22 @@ namespace ValleyReminders.ui
         *********/
         public Button() { }
 
-        public Button(Texture2D tex)
+        public Button(Texture2D tex, Rectangle rect, Vector2 size)
         {
             Texture = tex;
-            IdleTextureRect = new Rectangle(0, 0, tex.Width / 2, tex.Height);
-            HoverTextureRect = new Rectangle(tex.Width / 2, 0, tex.Width / 2, tex.Height);
+            TextureRect = rect;
+            Size = size;
+            IdleTint = Color.White;
+            HoverTint = Color.Wheat;
+        }
+
+        public Button(Texture2D tex, Rectangle rect, Vector2 size, Color idleTint, Color hoverTint)
+        {
+            Texture = tex;
+            TextureRect = rect;
+            Size = size;
+            IdleTint = idleTint;
+            HoverTint = hoverTint;
         }
 
         /// <inheritdoc />
@@ -60,10 +76,9 @@ namespace ValleyReminders.ui
             if (IsHidden())
                 return;
 
-            var texRect = Hover ? HoverTextureRect : IdleTextureRect;
-            Vector2 origin = new(texRect.Width / 2f, texRect.Height / 2f);
-            b.Draw(Texture, Position + origin, texRect, Color.White, 0f, origin, Scale, SpriteEffects.None, 0f);
-            Game1.activeClickableMenu?.drawMouse(b);
+            IClickableMenu.drawTextureBox(b, Game1.mouseCursors, TextureRect, (int)Position.X, (int)Position.Y, Width, Height, Hover ? HoverTint : IdleTint, 4f, drawShadow: false);
+
+            //Game1.activeClickableMenu?.drawMouse(b);
         }
     }
 }

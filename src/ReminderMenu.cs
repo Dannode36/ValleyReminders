@@ -17,65 +17,74 @@ namespace ValleyReminders
         private List<Reminder> reminders = new();
 
         private RootElement rootElement = new();
+        private Table table = new();
+        bool reminderListDirty;
 
         public void CreateInterface(List<Reminder> reminders)
         {
             this.reminders = reminders;
             initialize((Game1.uiViewport.Width / 2) - 500, (Game1.uiViewport.Height / 2) - 500, 1000, 800, true);
-            UpdateInterface();
+            CreateStaticInterface();
+            UpdateReminderList();
         }
 
-        public void UpdateInterface()
+        private void CreateStaticInterface()
         {
             rootElement = new();
 
-            Table table = new()
+            //Misc
+            {
+                /*var button = new Button(Utilities.Helper.ModContent.Load<Texture2D>(Utilities.Button))
+                {
+                    Callback = (e) => { reminders.Clear(); reminderListDirty = true; }
+                };*/
+                //rootElement.AddChild(button);
+
+                var label = new Label() { String = "Clear Reminders" };
+                rootElement.AddChild(label);
+            }
+        }
+
+        public void UpdateReminderList()
+        {
+            try
+            {
+                rootElement.RemoveChild(table);
+            }
+            catch (ArgumentException) { /* Do nothing */ }
+
+            //Reminders
+            table = new()
             {
                 RowHeight = 100,
                 Size = new(height, width),
                 LocalPosition = new((Game1.uiViewport.Width / 2f) - 400, (Game1.uiViewport.Height / 2f) - 400)
             };
 
+            foreach (Reminder reminder in reminders)
             {
-                var checkBox = new Checkbox()
+                var textBox = new Label()
+                {
+                    String = reminder.Message,
+                    Font = Game1.smallFont
+                    //LocalPosition = new(Position.X, Position.Y)
+                };
+                table.AddRow(new Element[] { textBox });
+            }
+
+            foreach (string funcName in Conditions.validCondFuncNames)
+            {
+                var button = new Button(Game1.mouseCursors, new(384, 396, 15, 15), new(200, 50))
                 {
                     Callback = (e) => { }
                 };
-                var label = new Label() { String = "Reminders Enabled", LocalPosition = new(checkBox.Width + 10, 0) };
-                table.AddRow(new Element[] { checkBox, label });
-            }
-
-            {
-                var button = new Button(Utilities.Helper.ModContent.Load<Texture2D>(Utilities.Button))
+                var textBox = new Label()
                 {
-                    Callback = (e) => { reminders.Clear(); UpdateInterface(); }
+                    String = funcName,
+                    Font = Game1.smallFont
+                    //LocalPosition = new(Position.X, Position.Y)
                 };
-                var label = new Label() { String = "Clear Reminders" };
-
-                table.AddRow(new Element[] { button, label });
-            }
-
-            {
-                //Reminders
-                Table reminderTable = new(false)
-                {
-                    RowHeight = 20,
-                    Size = new(600, 500),
-                    LocalPosition = new(100, 0)
-                };
-
-                foreach (Reminder reminder in reminders)
-                {
-                    var textBox = new Label()
-                    {
-                        String = reminder.Message,
-                        Font = Game1.smallFont
-                        //LocalPosition = new(Position.X, Position.Y)
-                    };
-                    reminderTable.AddRow(new Element[] { textBox });
-                }
-
-                table.AddRow(new Element[] { reminderTable });
+                table.AddRow(new Element[] { button, textBox });
             }
 
             rootElement.AddChild(table);
@@ -83,8 +92,20 @@ namespace ValleyReminders
 
         public override void update(GameTime time)
         {
+            if (reminderListDirty)
+            {
+                UpdateReminderList();
+                reminderListDirty = false;
+            }
+
             base.update(time);
             rootElement.Update();
+        }
+
+        public override void receiveScrollWheelAction(int direction)
+        {
+            base.receiveScrollWheelAction(direction);
+            table.Scrollbar.ScrollBy(direction);
         }
 
         public override void receiveLeftClick(int x, int y, bool playSound = true)
