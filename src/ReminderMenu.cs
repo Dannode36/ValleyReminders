@@ -12,13 +12,26 @@ using Textbox = ValleyReminders.ui.Textbox;
 
 namespace ValleyReminders
 {
+    enum ReminderMenuState
+    {
+        LIST,
+        EDIT,
+        CREATE
+    }
+
     class ReminderMenu : IClickableMenu
     {
-        private List<Reminder> reminders = new();
-
         private RootElement rootElement = new();
-        private Table table = new();
-        bool reminderListDirty;
+        private ReminderMenuState state = ReminderMenuState.LIST;
+
+        private Table reminderListPage = new();
+        private List<Reminder> reminders = new();
+        bool reminderListDirty = false;
+
+        private Table reminderEditPage = new();
+        private Reminder? selectedReminder = null;
+
+        private Table reminderCreationPage = new();
 
         public void CreateInterface(List<Reminder> reminders)
         {
@@ -26,6 +39,10 @@ namespace ValleyReminders
             initialize((Game1.uiViewport.Width / 2) - 500, (Game1.uiViewport.Height / 2) - 500, 1000, 800, true);
             CreateStaticInterface();
             UpdateReminderList();
+
+            rootElement.AddChild(reminderListPage);
+            rootElement.AddChild(reminderEditPage);
+            rootElement.AddChild(reminderCreationPage);
         }
 
         private void CreateStaticInterface()
@@ -40,6 +57,11 @@ namespace ValleyReminders
                 };*/
                 //rootElement.AddChild(button);
 
+                /*var button = new Button(Game1.mouseCursors, new(384, 396, 15, 15), new(200, 50))
+                {
+                    Callback = (e) => { reminders.Add(new()); reminderListDirty = true; }
+                };*/
+
                 var label = new Label() { String = "Clear Reminders" };
                 rootElement.AddChild(label);
             }
@@ -49,12 +71,12 @@ namespace ValleyReminders
         {
             try
             {
-                rootElement.RemoveChild(table);
+                rootElement.RemoveChild(reminderListPage);
             }
             catch (ArgumentException) { /* Do nothing */ }
 
             //Reminders
-            table = new()
+            reminderListPage = new()
             {
                 RowHeight = 100,
                 Size = new(height, width),
@@ -63,13 +85,17 @@ namespace ValleyReminders
 
             foreach (Reminder reminder in reminders)
             {
+                var button = new Button(Game1.mouseCursors, new(384, 396, 15, 15), new(200, 50))
+                {
+                    Callback = (e) => { selectedReminder = reminder; }
+                };
                 var textBox = new Label()
                 {
                     String = reminder.Message,
                     Font = Game1.smallFont
                     //LocalPosition = new(Position.X, Position.Y)
                 };
-                table.AddRow(new Element[] { textBox });
+                reminderListPage.AddRow(new Element[] { button, textBox });
             }
 
             foreach (string funcName in Conditions.validCondFuncNames)
@@ -84,28 +110,46 @@ namespace ValleyReminders
                     Font = Game1.smallFont
                     //LocalPosition = new(Position.X, Position.Y)
                 };
-                table.AddRow(new Element[] { button, textBox });
+                reminderListPage.AddRow(new Element[] { button, textBox });
             }
-
-            rootElement.AddChild(table);
         }
 
         public override void update(GameTime time)
         {
+            base.update(time);
+
             if (reminderListDirty)
             {
                 UpdateReminderList();
                 reminderListDirty = false;
             }
 
-            base.update(time);
-            rootElement.Update();
+            if(selectedReminder != null && state != ReminderMenuState.EDIT)
+            {
+                state = ReminderMenuState.EDIT;
+                UpdateReminderEditPage();
+            }
+
+            switch (state)
+            {
+                case ReminderMenuState.LIST:
+                    reminderListPage.Update();
+                    break;
+                case ReminderMenuState.EDIT:
+                    reminderEditPage.Update();
+                    break;
+                case ReminderMenuState.CREATE:
+                    reminderCreationPage.Update();
+                    break;
+                default:
+                    break;
+            }
         }
 
         public override void receiveScrollWheelAction(int direction)
         {
             base.receiveScrollWheelAction(direction);
-            table.Scrollbar.ScrollBy(direction);
+            reminderListPage.Scrollbar.ScrollBy(direction);
         }
 
         public override void receiveLeftClick(int x, int y, bool playSound = true)
@@ -115,7 +159,20 @@ namespace ValleyReminders
 
         public override void draw(SpriteBatch b)
         {
-            rootElement.Draw(b);
+            switch (state)
+            {
+                case ReminderMenuState.LIST:
+                    reminderListPage.Draw(b);
+                    break;
+                case ReminderMenuState.EDIT:
+                    reminderEditPage.Draw(b);
+                    break;
+                case ReminderMenuState.CREATE:
+                    reminderCreationPage.Draw(b);
+                    break;
+                default:
+                    break;
+            }
 
             if (shouldDrawCloseButton())
             {
