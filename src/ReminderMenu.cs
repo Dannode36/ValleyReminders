@@ -114,6 +114,25 @@ namespace ValleyReminders
             }
         }
 
+        private void UpdateReminderEditPage()
+        {
+            foreach (Reminder reminder in reminders)
+            {
+                //reminder.Message;
+                var button = new Button(Game1.mouseCursors, new(384, 396, 15, 15), new(200, 50))
+                {
+                    Callback = (e) => { selectedReminder = reminder; }
+                };
+                var textBox = new Label()
+                {
+                    String = reminder.Message,
+                    Font = Game1.smallFont
+                    //LocalPosition = new(Position.X, Position.Y)
+                };
+                reminderListPage.AddRow(new Element[] { button, textBox });
+            }
+        }
+
         public override void update(GameTime time)
         {
             base.update(time);
