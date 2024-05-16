@@ -2,6 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+using StardewValley;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace ValleyReminders.ui
 {
@@ -38,6 +41,8 @@ namespace ValleyReminders.ui
         }
 
         public Element[] Children => this.ChildrenImpl.ToArray();
+
+        public bool Selected { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
 
         /*********

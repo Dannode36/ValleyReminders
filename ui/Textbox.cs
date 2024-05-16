@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using StardewValley;
+using StardewValley.Menus;
 
 namespace ValleyReminders.ui
 {
@@ -75,7 +76,7 @@ namespace ValleyReminders.ui
             if (this.IsHidden())
                 return;
 
-            b.Draw(this.Tex, this.Position, Color.White);
+            b.Draw(Tex, Position, Color.White);
 
             // Copied from game code - caret
             string text = this.String;

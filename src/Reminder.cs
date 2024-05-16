@@ -15,6 +15,7 @@ namespace ValleyReminders
         public int StartDay { get; set; }
         public int Time { get; set; } //Only valid in increments of 10 in the range 600-2600
         public int Interval { get; set; }
+        public bool Enabled { get; set; } = true;
 
         public List<ConditionData> Conditions = new();
 
@@ -31,13 +32,12 @@ namespace ValleyReminders
 
         public bool IsReadyToNotify()
         {
+            if(!Enabled) return false;
+
             foreach (var condition in Conditions)
             {
                 object?[] objects = { condition.Parameters };
                 object? result = typeof(Conditions).GetMethod(condition.MethodName)?.Invoke(this, objects);
-
-                Utilities.Monitor.Log($"Condition ({condition.MethodName}) was {(bool?)result}");
-
                 if ((bool?)result == false) return false;
             }
 

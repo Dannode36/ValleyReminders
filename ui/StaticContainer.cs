@@ -16,12 +16,12 @@ namespace ValleyReminders.ui
 
         public override void Draw(SpriteBatch b)
         {
-            if (this.IsHidden())
+            if (IsHidden())
                 return;
 
-            if (this.OutlineColor.HasValue)
+            if (OutlineColor.HasValue)
             {
-                IClickableMenu.drawTextureBox(b, (int)this.Position.X - 12, (int)this.Position.Y - 12, this.Width + 24, this.Height + 24, this.OutlineColor.Value);
+                IClickableMenu.drawTextureBox(b, (int)Position.X - 12, (int)Position.Y - 12, Width + 24, Height + 24, OutlineColor.Value);
             }
             base.Draw(b);
         }
