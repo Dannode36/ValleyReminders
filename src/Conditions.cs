@@ -28,37 +28,66 @@ namespace ValleyReminders
         {
             ParameterList parameterList = new();
 
-            ParameterInfo[]? pInfos = typeof(Conditions).GetMethod(methodName)?.GetParameters();
-            for (int i = 0; i < pInfos?.Length; i++)
+            try
             {
-                parameterList.Add(new(pInfos[i].Name ?? string.Empty, GetParameterType(pInfos[i].ParameterType)));
+                string?[] pNames = GetParameterNames(methodName);
+                ParameterType[] pTypes = GetParameterTypes(methodName);
+
+                for (int i = 0; i < pNames.Length; i++)
+                {
+                    parameterList.Add(new(pNames[i] ?? string.Empty, pTypes[i]));
+                }
+            }
+            catch (IndexOutOfRangeException)
+            {
+                Utilities.Monitor.Log("ParameterTypes/Defintion mismatch when creating parameter list. Please contact mod author", StardewModdingAPI.LogLevel.Error);
+                throw;
             }
 
             return parameterList;
         }
 
-        public static ParameterType GetParameterType(Type type)
+        public static string?[] GetParameterNames(string methodName)
         {
-            if (type == typeof(int)) return ParameterType.Int;
-            else if (type == typeof(float)) return ParameterType.Float;
-            else return ParameterType.String;
+            return typeof(Conditions).GetMethod(methodName)?.GetParameters()?.Select(x => x.Name).ToArray() ?? Array.Empty<string?>();
+        }
+
+        public static ParameterType[] GetParameterTypes(string methodName)
+        {
+            return typeof(Conditions)
+                .GetMethod(methodName)?
+                .GetCustomAttribute(typeof(ParameterTypeAttribute)) is not ParameterTypeAttribute attribute ? Array.Empty<ParameterType>() : attribute.ParamTypes;
         }
 
         //Date & Time
-        public static bool IsTimeOfDay(int time) => Game1.timeOfDay == time;
-        public static bool IsDayOfMonth(int day) => SDate.Now().Day == day;
-        public static bool IsDay(int day) => SDate.Now().DaysSinceStart == day;
+        [ParameterType(ParameterType.Int)]
+        public static bool IsTimeOfDay(string time) => Game1.timeOfDay == int.Parse(time);
+
+        [ParameterType(ParameterType.Int)]
+        public static bool IsDayOfMonth(string day) => SDate.Now().Day == int.Parse(day);
+
+        [ParameterType(ParameterType.Int)]
+        public static bool IsDay(string day) => SDate.Now().DaysSinceStart == int.Parse(day);
+
+        [ParameterType(ParameterType.String)]
         public static bool IsSeason(string season) => SDate.Now().SeasonKey == season;
-        public static bool IsYear(int year) => SDate.Now().Year == year;
+
+        [ParameterType(ParameterType.Int)]
+        public static bool IsYear(string year) => SDate.Now().Year == int.Parse(year);
 
         //World
         public static bool IsRaining() => Game1.isRaining;
         public static bool IsRainingTomorrow() => Game1.weatherForTomorrow == Game1.weather_rain;
+        [ParameterType(ParameterType.String)]
         public static bool IsWeatherTomorrow(string weather) => Game1.weatherForTomorrow == weather;
 
         //Player
-        public static bool HasAchievement(int achievement) => Game1.achievements.ContainsKey(achievement);
-        public static bool HasSkillLevel(int skill, int level) => Game1.player.GetSkillLevel(skill) >= level;
+        [ParameterType(ParameterType.Int)]
+        public static bool HasAchievement(string achievement) => Game1.achievements.ContainsKey(int.Parse(achievement));
+
+        [ParameterType(ParameterType.Int, ParameterType.Int)]
+        public static bool HasSkillLevel(string skill, string level) => Game1.player.GetSkillLevel(int.Parse(skill)) >= int.Parse(level);
+
         public static bool HasSkullKey() => Game1.player.hasSkullKey;
     }
 }

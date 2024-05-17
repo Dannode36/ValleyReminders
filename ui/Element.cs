@@ -12,34 +12,33 @@ namespace ValleyReminders.ui
         /*********
         ** Accessors
         *********/
-        public object UserData { get; set; }
+        public object? UserData { get; set; }
 
-        public Container Parent { get; internal set; }
+        public Container? Parent { get; internal set; }
         public Vector2 LocalPosition { get; set; }
         public Vector2 Position
         {
             get
             {
                 if (Parent != null)
-                    return Parent.Position + this.LocalPosition;
+                    return Parent.Position + LocalPosition;
                 return LocalPosition;
             }
         }
 
         public abstract int Width { get; }
         public abstract int Height { get; }
-        public Rectangle Bounds => new((int)this.Position.X, (int)Position.Y, this.Width, this.Height);
+        public Rectangle Bounds => new((int)Position.X, (int)Position.Y, Width, Height);
 
         public bool Hover { get; private set; }
-        public virtual string HoveredSound => null;
+        public virtual string HoveredSound => string.Empty;
 
         public bool ClickGestured { get; private set; }
-        public bool Clicked => this.Hover && ClickGestured;
-        public virtual string ClickedSound => null;
+        public bool Clicked => Hover && ClickGestured;
+        public virtual string ClickedSound => string.Empty;
 
         /// <summary>Whether to disable the element so it's invisible and can't be interacted with.</summary>
         public Func<bool>? ForceHide;
-    
 
         /*********
         ** Public methods
