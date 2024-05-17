@@ -19,20 +19,20 @@ namespace ValleyReminders.ui
 
         public SpriteFont Font { get; set; } = Game1.dialogueFont; // Only applies when Bold = false
 
-        public float Scale => this.Bold ? 1f : this.NonBoldScale;
+        public float Scale => Bold ? 1f : NonBoldScale;
 
-        public string String { get; set; }
+        public string String { get; set; } = string.Empty;
 
-        public Action<Element> Callback { get; set; }
-
-        /// <inheritdoc />
-        public override int Width => (int)this.Measure().X;
+        public Action<Element>? Callback { get; set; }
 
         /// <inheritdoc />
-        public override int Height => (int)this.Measure().Y;
+        public override int Width => (int)Measure().X;
 
         /// <inheritdoc />
-        public override string HoveredSound => (this.Callback != null) ? "shiny4" : null;
+        public override int Height => (int)Measure().Y;
+
+        /// <inheritdoc />
+        public override string HoveredSound => (Callback != null) ? "shiny4" : string.Empty;
 
 
         /*********
@@ -80,7 +80,7 @@ namespace ValleyReminders.ui
         /// <param name="bold">Whether the font is bold.</param>
         /// <param name="scale">The scale to apply to the size.</param>
         /// <param name="font">The font to measure. Defaults to <see cref="Game1.dialogueFont"/> if <c>null</c>.</param>
-        public static Vector2 MeasureString(string text, bool bold = false, float scale = 1f, SpriteFont font = null)
+        public static Vector2 MeasureString(string text, bool bold = false, float scale = 1f, SpriteFont? font = null)
         {
             if (bold)
                 return new Vector2(SpriteText.getWidthOfString(text) * scale, SpriteText.getHeightOfString(text) * scale);

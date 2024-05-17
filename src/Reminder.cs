@@ -36,7 +36,7 @@ namespace ValleyReminders
 
             foreach (var condition in Conditions)
             {
-                object?[] objects = { condition.Parameters };
+                object?[] objects = { condition.ParameterValues };
                 object? result = typeof(Conditions).GetMethod(condition.MethodName)?.Invoke(this, objects);
                 if ((bool?)result == false) return false;
             }

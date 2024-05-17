@@ -5,6 +5,8 @@ using StardewModdingAPI.Events;
 using StardewModdingAPI.Utilities;
 using StardewValley;
 
+using ParameterList = System.Collections.Generic.List<System.Collections.Generic.KeyValuePair<string, ValleyReminders.ParameterType>>;
+
 namespace ValleyReminders
 {
     /// <summary>The mod entry point.</summary>
@@ -51,11 +53,23 @@ namespace ValleyReminders
             Utilities.Monitor = Monitor;
 
             //Get the names of all reminder condition functions available to the user at runtime
-            Conditions.validCondFuncNames = typeof(Conditions)
+            {
+                List<string> methodNameList = typeof(Conditions)
                 .GetMethods()
                 .Where(x => x.ReturnType == typeof(bool) && x.IsStatic)
                 .Select(x => x.Name)
                 .ToList();
+
+                SortedDictionary<string, ParameterList> methodNameAndParameterInfo = new();
+
+                foreach (var methodName in methodNameList)
+                {
+                    methodNameAndParameterInfo.Add(methodName, Conditions.GetParameterList(methodName));
+                }
+
+                Conditions.conditionFunctions = methodNameAndParameterInfo;
+            }
+
 
             helper.Events.GameLoop.TimeChanged += OnTimeChanged;
             helper.Events.GameLoop.DayStarted += OnDayStarted;

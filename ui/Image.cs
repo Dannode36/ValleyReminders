@@ -49,7 +49,7 @@ namespace ValleyReminders.ui
             if (this.IsHidden())
                 return;
 
-            b.Draw(this.Texture, this.Position, this.TexturePixelArea, DrawColor, 0, Vector2.Zero, this.Scale, SpriteEffects.None, 1);
+            b.Draw(Texture, Position, TexturePixelArea, DrawColor, 0, Vector2.Zero, this.Scale, SpriteEffects.None, 1);
         }
 
 

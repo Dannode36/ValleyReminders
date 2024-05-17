@@ -16,7 +16,6 @@ namespace ValleyReminders.ui
 
         private Vector2 SizeImpl;
 
-        private const int RowPadding = 16;
         private int RowHeightImpl;
         private bool FixedRowHeight;
         private int ContentHeight;
@@ -40,7 +39,7 @@ namespace ValleyReminders.ui
             get => this.RowHeightImpl;
             set
             {
-                this.RowHeightImpl = value + Table.RowPadding;
+                this.RowHeightImpl = value + RowPadding;
                 this.UpdateScrollbar();
             }
         }
@@ -55,6 +54,7 @@ namespace ValleyReminders.ui
         /// <inheritdoc />
         public override int Height => (int)this.Size.Y;
 
+        public int RowPadding { get; set; } = 16;
 
         /*********
         ** Public methods

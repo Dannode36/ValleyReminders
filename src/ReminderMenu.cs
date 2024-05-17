@@ -22,6 +22,11 @@ namespace ValleyReminders
 
     class ReminderMenu : IClickableMenu
     {
+        public const int Width = 800;
+        public const int Height = 1000;
+
+        public static Vector2 Center => new((Game1.uiViewport.Width - Width) / 2, (Game1.uiViewport.Height - Height) / 2);
+
         private RootElement rootElement = new();
         private ReminderMenuState state = ReminderMenuState.LIST;
 
@@ -34,10 +39,19 @@ namespace ValleyReminders
 
         private Table reminderCreationPage = new();
 
+        private Image pixel = new();
+
         public void CreateInterface(List<Reminder> reminders)
         {
+            pixel = new()
+            {
+                Texture = Game1.mouseCursors,
+                TexturePixelArea = null //new(0, 0, Game1.uiViewport.Width, Game1.uiViewport.Height),
+            };
+
             this.reminders = reminders;
-            initialize((Game1.uiViewport.Width / 2) - 500, (Game1.uiViewport.Height / 2) - 500, 1000, 800, true);
+
+            initialize((int)Center.X, (int)Center.Y, Width, Height, true);
             CreateStaticInterface();
             UpdateReminderListPage();
         }
@@ -45,65 +59,39 @@ namespace ValleyReminders
         private void CreateStaticInterface()
         {
             rootElement = new();
-
-            //Misc
-            {
-                /*var button = new Button(Utilities.Helper.ModContent.Load<Texture2D>(Utilities.Button))
-                {
-                    Callback = (e) => { reminders.Clear(); reminderListDirty = true; }
-                };*/
-                //rootElement.AddChild(button);
-
-                /*var button = new Button(Game1.mouseCursors, new(384, 396, 15, 15), new(200, 50))
-                {
-                    Callback = (e) => { reminders.Add(new()); reminderListDirty = true; }
-                };*/
-
-                var label = new Label() { String = "Clear Reminders" };
-
-                rootElement.AddChild(label);
-                rootElement.AddChild(reminderListPage);
-                rootElement.AddChild(reminderEditPage);
-                rootElement.AddChild(reminderCreationPage);
-            }
+            rootElement.AddChild(reminderListPage);
+            rootElement.AddChild(reminderEditPage);
+            rootElement.AddChild(reminderCreationPage);
+            rootElement.AddChild(pixel);
         }
 
         public void UpdateReminderListPage()
         {
+            try
+            {
+                rootElement.RemoveChild(reminderListPage);
+            }
+            catch (ArgumentException) { /* Do nothing */ }
+
             reminderListPage = new()
             {
                 RowHeight = 100,
-                Size = new(height, width),
-                LocalPosition = new((Game1.uiViewport.Width / 2f) - 400, (Game1.uiViewport.Height / 2f) - 400)
+                Size = new(Width, Height),
+                LocalPosition = Center,
             };
 
             //Reminders
             foreach (Reminder reminder in reminders)
             {
-                var button = new Button(Game1.mouseCursors, new(384, 396, 15, 15), new(200, 50))
+                var button = new Button(Game1.mouseCursors, new(384, 396, 15, 15), new(Width + 40, reminderListPage.RowHeight + 4))
                 {
-                    Callback = (e) => { selectedReminder = reminder; }
+                    Callback = (e) => { selectedReminder = reminder; },
+                    LocalPosition = new(-20, -380)
                 };
                 var textBox = new Label()
                 {
                     String = reminder.Message,
-                    Font = Game1.smallFont
-                    //LocalPosition = new(Position.X, Position.Y)
-                };
-                reminderListPage.AddRow(new Element[] { button, textBox });
-            }
-
-            //Just for testing
-            foreach (string funcName in Conditions.validCondFuncNames)
-            {
-                var button = new Button(Game1.mouseCursors, new(384, 396, 15, 15), new(200, 50))
-                {
-                    Callback = (e) => { }
-                };
-                var textBox = new Label()
-                {
-                    String = funcName,
-                    Font = Game1.smallFont
+                    Bold = true,
                     //LocalPosition = new(Position.X, Position.Y)
                 };
                 reminderListPage.AddRow(new Element[] { button, textBox });
@@ -123,9 +111,9 @@ namespace ValleyReminders
 
             reminderEditPage = new()
             {
-                Size = new(height, width),
-                LocalPosition = new((Game1.uiViewport.Width / 2f) - 400, (Game1.uiViewport.Height / 2f) - 400),
-                OutlineColor = Color.White,
+                Size = new(width, height),
+                LocalPosition = Center,
+                OutlineColor = Color.White
             };
 
             var msgTextBox = new Textbox()
@@ -150,7 +138,94 @@ namespace ValleyReminders
             };
             reminderEditPage.AddChild(enabledCheckbox);
 
-            var backButton = new Button(Game1.mouseCursors, new(352, 495, 12, 11), new(48, 440))
+            //Reminder conditions table
+            {
+                var conditions = new Table()
+                {
+                    RowHeight = 100,
+                    Size = new(width, height)
+                };
+
+                //Display conditions
+                foreach (var cond in selectedReminder.Conditions)
+                {
+                    var conditionName = new Label()
+                    {
+                        String = cond.MethodName,
+                        Font = Game1.smallFont
+                    };
+
+                    List<Element> row = new();
+
+                    //Display condition parameters names and inputs
+                    int i = 0;
+                    int previousWidth = conditionName.Width;
+                    foreach (var condParameter in Conditions.GetParameterList(cond.MethodName))
+                    {
+                        if(Conditions.GetParameterList(cond.MethodName).Count > 1)
+                        {
+                            var condParameterLabel = new Label()
+                            {
+                                String = condParameter.Key,
+                                Font = Game1.smallFont,
+                                LocalPosition = new(previousWidth + 25, 0)
+                            };
+                            previousWidth += condParameterLabel.Width + 25;
+                            row.Add(condParameterLabel);
+                        }
+
+                        int parameterIndex = i; //Temporary variable for lambda capture or ArgumentOutOfRangeException is bound to happen
+                        switch (condParameter.Value)
+                        {
+                            case ParameterType.String:
+                                Textbox condParameterTextBox = new()
+                                {
+                                    String = cond.ParameterValues[i],
+                                    Callback = (e) => {
+                                        cond.ParameterValues[parameterIndex] = (e as Textbox)!.String;
+                                    },
+                                    LocalPosition = new(previousWidth + 25, 0)
+                                };
+                                previousWidth += condParameterTextBox.Width + 25;
+                                row.Add(condParameterTextBox);
+                                break;
+                            case ParameterType.Int:
+                                Intbox condParameterIntBox = new()
+                                {
+                                    String = cond.ParameterValues[i],
+                                    Callback = (e) => {
+                                        cond.ParameterValues[parameterIndex] = (e as Intbox)!.Value.ToString();
+                                    },
+                                    LocalPosition = new(previousWidth + 25, 0)
+                                };
+                                previousWidth += condParameterIntBox.Width + 25;
+                                row.Add(condParameterIntBox);
+                                break;
+                            case ParameterType.Float:
+                                Floatbox condParameterFloatBox = new()
+                                {
+                                    String = cond.ParameterValues[i],
+                                    Callback = (e) => {
+                                        cond.ParameterValues[parameterIndex] = (e as Floatbox)!.Value.ToString();
+                                    },
+                                    LocalPosition = new(previousWidth + 25, 0)
+                                };
+                                previousWidth += condParameterFloatBox.Width + 25;
+                                row.Add(condParameterFloatBox);
+                                break;
+                            default:
+                                throw new ArgumentException("Parameter type enum was not a known value");
+                        }
+                        i++;
+                    }
+                    row.Add(conditionName);
+                    conditions.AddRow(row.ToArray());
+                }
+                reminderEditPage.AddChild(conditions);
+            }
+
+            //Menu buttons
+            var backButton = new Button(Game1.mouseCursors, new(352, 495, 12, 11), new(48, 44))
             {
                 LocalPosition = new Vector2(200, 200),
                 Callback = (e) => { this.selectedReminder = null; state = ReminderMenuState.LIST; }
@@ -213,6 +288,10 @@ namespace ValleyReminders
                 default:
                     break;
             }
+
+            //pixel.Draw(b);
+            //b.Draw(Game1.mouseCursors, new Vector2(0, 0), null, Color.White);
+            //drawTextureBox(b, 0, 0, Game1.uiViewport.Width, Game1.uiViewport.Height, Color.White);
 
             if (shouldDrawCloseButton())
             {
