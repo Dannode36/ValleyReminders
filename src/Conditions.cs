@@ -1,18 +1,13 @@
 ﻿using StardewModdingAPI.Utilities;
 using StardewValley;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
 //Represents a list of parameter names paired to their corresponding type
 using ParameterList = System.Collections.Generic.List<System.Collections.Generic.KeyValuePair<string, ValleyReminders.ParameterType>>;
 
 namespace ValleyReminders
 {
+    //Used for parsing user input/UI
     public enum ParameterType
     {
         String,
@@ -47,6 +42,11 @@ namespace ValleyReminders
             return parameterList;
         }
 
+        public static int GetParameterCount(string methodName)
+        {
+            return GetParameterNames(methodName).Length;
+        }
+
         public static string?[] GetParameterNames(string methodName)
         {
             return typeof(Conditions).GetMethod(methodName)?.GetParameters()?.Select(x => x.Name).ToArray() ?? Array.Empty<string?>();
@@ -77,7 +77,9 @@ namespace ValleyReminders
 
         //World
         public static bool IsRaining() => Game1.isRaining;
+
         public static bool IsRainingTomorrow() => Game1.weatherForTomorrow == Game1.weather_rain;
+
         [ParameterType(ParameterType.String)]
         public static bool IsWeatherTomorrow(string weather) => Game1.weatherForTomorrow == weather;
 

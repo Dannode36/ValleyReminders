@@ -63,9 +63,7 @@ namespace ValleyReminders.ui
 
         public static void Swap<T>(ref T lhs, ref T rhs)
         {
-            T temp = lhs;
-            lhs = rhs;
-            rhs = temp;
+            (rhs, lhs) = (lhs, rhs);
         }
 
         // https://stackoverflow.com/a/1626175/17827276
@@ -74,7 +72,7 @@ namespace ValleyReminders.ui
             int hi = Convert.ToInt32(Math.Floor(hue / 60)) % 6;
             double f = hue / 60 - Math.Floor(hue / 60);
 
-            value = value * 255;
+            value *= 255;
             int v = Convert.ToInt32(value);
             int p = Convert.ToInt32(value * (1 - saturation));
             int q = Convert.ToInt32(value * (1 - f * saturation));

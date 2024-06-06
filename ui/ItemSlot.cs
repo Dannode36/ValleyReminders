@@ -12,7 +12,7 @@ namespace ValleyReminders.ui
 {
     internal class ItemSlot : ItemWithBorder
     {
-        public Item Item { get; set; }
+        public Item? Item { get; set; }
 
         public override void Draw( SpriteBatch b )
         {
@@ -25,8 +25,8 @@ namespace ValleyReminders.ui
             }
             if ( Item != null )
                 Item.drawInMenu( b, Position + (BoxIsThin ? Vector2.Zero : new Vector2(16, 16)), 1, 1, 1 );
-            else if ( ItemDisplay != null )
-                ItemDisplay.drawInMenu( b, Position + (BoxIsThin ? Vector2.Zero : new Vector2(16, 16)), 1, TransparentItemDisplay ? 0.5f : 1, 1 );
+            else
+                ItemDisplay?.drawInMenu( b, Position + (BoxIsThin ? Vector2.Zero : new Vector2(16, 16)), 1, TransparentItemDisplay ? 0.5f : 1, 1 );
         }
     }
 }

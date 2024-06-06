@@ -17,7 +17,7 @@ namespace ValleyReminders.ui
         /*********
         ** Accessors
         *********/
-        public Texture2D Texture { get; set; }
+        public Texture2D? Texture { get; set; }
         public Rectangle TextureRect { get; set; } = Rectangle.Empty;
 
         public Color IdleTint { get; set; }

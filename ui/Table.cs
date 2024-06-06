@@ -17,7 +17,7 @@ namespace ValleyReminders.ui
         private Vector2 SizeImpl;
 
         private int RowHeightImpl;
-        private bool FixedRowHeight;
+        private readonly bool FixedRowHeight;
         private int ContentHeight;
 
 
@@ -26,33 +26,33 @@ namespace ValleyReminders.ui
         *********/
         public Vector2 Size
         {
-            get => this.SizeImpl;
+            get => SizeImpl;
             set
             {
-                this.SizeImpl = new Vector2(value.X, ((int)value.Y) / this.RowHeight * this.RowHeight);
-                this.UpdateScrollbar();
+                SizeImpl = new Vector2(value.X, ((int)value.Y) / RowHeight * RowHeight);
+                UpdateScrollbar();
             }
         }
 
         public int RowHeight
         {
-            get => this.RowHeightImpl;
+            get => RowHeightImpl;
             set
             {
-                this.RowHeightImpl = value + RowPadding;
-                this.UpdateScrollbar();
+                RowHeightImpl = value + RowPadding;
+                UpdateScrollbar();
             }
         }
 
-        public int RowCount => this.Rows.Count;
+        public int RowCount => Rows.Count;
 
         public Scrollbar Scrollbar { get; }
 
         /// <inheritdoc />
-        public override int Width => (int)this.Size.X;
+        public override int Width => (int)Size.X;
 
         /// <inheritdoc />
-        public override int Height => (int)this.Size.Y;
+        public override int Height => (int)Size.Y;
 
         public int RowPadding { get; set; } = 16;
 
@@ -61,87 +61,87 @@ namespace ValleyReminders.ui
         *********/
         public Table(bool fixedRowHeight = true)
         {
-            this.FixedRowHeight = fixedRowHeight;
-            this.UpdateChildren = false; // table will update children itself
-            this.Scrollbar = new Scrollbar
+            FixedRowHeight = fixedRowHeight;
+            UpdateChildren = false; // table will update children itself
+            Scrollbar = new Scrollbar
             {
                 LocalPosition = new Vector2(0, 0)
             };
-            this.AddChild(this.Scrollbar);
+            AddChild(Scrollbar);
         }
 
         public void AddRow(Element[] elements)
         {
-            this.Rows.Add(elements);
+            Rows.Add(elements);
             int maxElementHeight = 0;
             foreach (var child in elements)
             {
-                this.AddChild(child);
+                AddChild(child);
                 maxElementHeight = Math.Max(maxElementHeight, child.Height);
             }
-            this.ContentHeight += this.FixedRowHeight ? this.RowHeight : maxElementHeight + RowPadding;
-            this.UpdateScrollbar();
+            ContentHeight += FixedRowHeight ? RowHeight : maxElementHeight + RowPadding;
+            UpdateScrollbar();
         }
 
         /// <inheritdoc />
         public override void Update(bool isOffScreen = false)
         {
             base.Update(isOffScreen);
-            if (this.IsHidden(isOffScreen))
+            if (IsHidden(isOffScreen))
                 return;
 
             int topPx = 0;
-            foreach (var row in this.Rows)
+            foreach (var row in Rows)
             {
                 int maxElementHeight = 0;
                 foreach (var element in row)
                 {
-                    element.LocalPosition = new Vector2(element.LocalPosition.X, topPx - this.Scrollbar.TopRow * this.RowHeight);
-                    bool isChildOffScreen = isOffScreen || this.IsElementOffScreen(element);
+                    element.LocalPosition = new Vector2(element.LocalPosition.X, topPx - Scrollbar.TopRow * RowHeight);
+                    bool isChildOffScreen = isOffScreen || IsElementOffScreen(element);
 
                     if (!isChildOffScreen || element is Label) // Labels must update anyway to get rid of hovertext on scrollwheel
                         element.Update(isOffScreen: isChildOffScreen);
                     maxElementHeight = Math.Max(maxElementHeight, element.Height);
                 }
-                topPx += this.FixedRowHeight ? this.RowHeight : maxElementHeight + RowPadding;
+                topPx += FixedRowHeight ? RowHeight : maxElementHeight + RowPadding;
             }
 
-            if (topPx != this.ContentHeight) {
-                this.ContentHeight = topPx;
-                this.Scrollbar.Rows = PxToRow(this.ContentHeight);
+            if (topPx != ContentHeight) {
+                        ContentHeight = topPx;
+                Scrollbar.Rows = PxToRow(ContentHeight);
             }
 
-            this.Scrollbar.Update();
+            Scrollbar.Update();
         }
 
         public void ForceUpdateEvenHidden(bool isOffScreen = false)
         {
             int topPx = 0;
-            foreach (var row in this.Rows)
+            foreach (var row in Rows)
             {
                 int maxElementHeight = 0;
                 foreach (var element in row)
                 {
-                    element.LocalPosition = new Vector2(element.LocalPosition.X, topPx - this.Scrollbar.ScrollPercent * this.Rows.Count * this.RowHeight);
-                    bool isChildOffScreen = isOffScreen || this.IsElementOffScreen(element);
+                    element.LocalPosition = new Vector2(element.LocalPosition.X, topPx - Scrollbar.ScrollPercent * Rows.Count * RowHeight);
+                    bool isChildOffScreen = isOffScreen || IsElementOffScreen(element);
 
                     element.Update(isOffScreen: isChildOffScreen);
                     maxElementHeight = Math.Max(maxElementHeight, element.Height);
                 }
-                topPx += this.FixedRowHeight ? this.RowHeight : maxElementHeight + RowPadding;
+                topPx += FixedRowHeight ? RowHeight : maxElementHeight + RowPadding;
             }
-            this.ContentHeight = topPx;
-            this.Scrollbar.Update(isOffScreen);
+            ContentHeight = topPx;
+            Scrollbar.Update(isOffScreen);
         }
 
         /// <inheritdoc />
         public override void Draw(SpriteBatch b)
         {
-            if (this.IsHidden())
+            if (IsHidden())
                 return;
 
             // calculate draw area
-            var backgroundArea = new Rectangle((int)this.Position.X - 32, (int)this.Position.Y - 32, (int)this.Size.X + 64, (int)this.Size.Y + 64);
+            var backgroundArea = new Rectangle((int)Position.X - 32, (int)Position.Y - 32, (int)Size.X + 64, (int)Size.Y + 64);
             int contentPadding = 12;
             var contentArea = new Rectangle(backgroundArea.X + contentPadding, backgroundArea.Y + contentPadding, backgroundArea.Width - contentPadding * 2, backgroundArea.Height - contentPadding * 2);
 
@@ -153,15 +153,15 @@ namespace ValleyReminders.ui
             // This uses a scissor rectangle to clip content taller than one row that might be
             // drawn past the bottom of the UI, like images or complex options.
             Element? renderLast = null;
-            this.InScissorRectangle(b, contentArea, contentBatch =>
+            InScissorRectangle(b, contentArea, contentBatch =>
             {
-                foreach (var row in this.Rows)
+                foreach (var row in Rows)
                 {
                     foreach (var element in row)
                     {
-                        if (this.IsElementOffScreen(element))
+                        if (IsElementOffScreen(element))
                             continue;
-                        if (element == this.RenderLast) {
+                        if (element == RenderLast) {
                             renderLast = element;
                             continue;
                         }
@@ -171,7 +171,7 @@ namespace ValleyReminders.ui
             });
             renderLast?.Draw(b);
 
-            this.Scrollbar.Draw(b);
+            Scrollbar.Draw(b);
         }
 
 
@@ -183,25 +183,25 @@ namespace ValleyReminders.ui
         private bool IsElementOffScreen(Element element)
         {
             return
-                element.Position.Y + element.Height < this.Position.Y
-                || element.Position.Y > this.Position.Y + this.Size.Y;
+                element.Position.Y + element.Height < Position.Y
+                || element.Position.Y > Position.Y + Size.Y;
         }
 
         private void UpdateScrollbar()
         {
-            this.Scrollbar.LocalPosition = new Vector2(this.Size.X + 48, this.Scrollbar.LocalPosition.Y);
-            this.Scrollbar.RequestHeight = (int)this.Size.Y;
-            this.Scrollbar.Rows = PxToRow(this.ContentHeight);
-            this.Scrollbar.FrameSize = (int)(this.Size.Y / this.RowHeight);
+            Scrollbar.LocalPosition = new Vector2(Size.X + 48, Scrollbar.LocalPosition.Y);
+            Scrollbar.RequestHeight = (int)Size.Y;
+            Scrollbar.Rows = PxToRow(ContentHeight);
+            Scrollbar.FrameSize = (int)(Size.Y / RowHeight);
         }
 
-        private void InScissorRectangle(SpriteBatch spriteBatch, Rectangle area, Action<SpriteBatch> draw)
+        private static void InScissorRectangle(SpriteBatch spriteBatch, Rectangle area, Action<SpriteBatch> draw)
         {
             // render the current sprite batch to the screen
             spriteBatch.End();
 
             // start temporary sprite batch
-            using SpriteBatch contentBatch = new SpriteBatch(Game1.graphics.GraphicsDevice);
+            using SpriteBatch contentBatch = new(Game1.graphics.GraphicsDevice);
             GraphicsDevice device = Game1.graphics.GraphicsDevice;
             Rectangle prevScissorRectangle = device.ScissorRectangle;
 
@@ -226,7 +226,7 @@ namespace ValleyReminders.ui
 
         private int PxToRow(int px)
         {
-            return (px + this.RowHeight - 1) / this.RowHeight;
+            return (px + RowHeight - 1) / RowHeight;
         }
     }
 }

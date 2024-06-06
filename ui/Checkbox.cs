@@ -11,11 +11,11 @@ namespace ValleyReminders.ui
         /*********
         ** Accessors
         *********/
-        public Texture2D Texture { get; set; }
+        public Texture2D? Texture { get; set; }
         public Rectangle CheckedTextureRect { get; set; }
         public Rectangle UncheckedTextureRect { get; set; }
 
-        public Action<Element> Callback { get; set; }
+        public Action<Element>? Callback { get; set; }
 
         public bool Checked { get; set; } = true;
 

@@ -17,11 +17,11 @@ namespace ValleyReminders
         public int Interval { get; set; }
         public bool Enabled { get; set; } = true;
 
-        public List<ConditionData> Conditions = new();
+        public List<ConditionUserData> Conditions = new();
 
         public Reminder() { }
 
-        public Reminder(string message, int startDay, int time = 600, int interval = -1, List<ConditionData>? conditions = null)
+        public Reminder(string message, int startDay, int time = 600, int interval = -1, List<ConditionUserData>? conditions = null)
         {
             Message = message;
             StartDay = startDay;
@@ -64,7 +64,7 @@ namespace ValleyReminders
 
         public bool IsRecurring()
         {
-            return Interval !< 1;
+            return Interval > 0;
         }
 
         public void Notify()

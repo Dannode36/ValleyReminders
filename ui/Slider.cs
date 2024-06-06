@@ -21,7 +21,7 @@ namespace ValleyReminders.ui
         *********/
         public int RequestWidth { get; set; }
 
-        public Action<Element> Callback { get; set; }
+        public Action<Element>? Callback { get; set; }
 
         /// <inheritdoc />
         public override int Width => this.RequestWidth;
@@ -37,7 +37,7 @@ namespace ValleyReminders.ui
         public override void Draw(SpriteBatch b) { }
     }
 
-    internal class Slider<T> : Slider
+    internal class Slider<T> : Slider where T : struct
     {
         /*********
         ** Accessors
@@ -99,8 +99,8 @@ namespace ValleyReminders.ui
                 _ => 0
             };
 
-            Rectangle back = new Rectangle((int)this.Position.X, (int)this.Position.Y, this.Width, this.Height);
-            Rectangle front = new Rectangle((int)(this.Position.X + perc * (this.Width - 40)), (int)this.Position.Y, 40, this.Height);
+            Rectangle back = new((int)this.Position.X, (int)this.Position.Y, this.Width, this.Height);
+            Rectangle front = new((int)(this.Position.X + perc * (this.Width - 40)), (int)this.Position.Y, 40, this.Height);
 
             IClickableMenu.drawTextureBox(b, Game1.mouseCursors, new Rectangle(403, 383, 6, 6), back.X, back.Y, back.Width, back.Height, Color.White, Game1.pixelZoom, false);
             b.Draw(Game1.mouseCursors, new Vector2(front.X, front.Y), new Rectangle(420, 441, 10, 6), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.9f);

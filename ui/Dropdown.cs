@@ -16,7 +16,7 @@ namespace ValleyReminders.ui
         *********/
         public int RequestWidth { get; set; }
         public int MaxValuesAtOnce { get; set; }
-        public Texture2D Texture { get; set; } = Game1.mouseCursors;
+        public Texture2D? Texture { get; set; } = Game1.mouseCursors;
         public Rectangle BackgroundTextureRect { get; set; } = OptionsDropDown.dropDownBGSource;
         public Rectangle ButtonTextureRect { get; set; } = OptionsDropDown.dropDownButtonSource;
 
@@ -37,9 +37,9 @@ namespace ValleyReminders.ui
 
         public bool Dropped;
 
-        public Action<Element> Callback;
+        public Action<Element>? Callback;
 
-        public static Dropdown ActiveDropdown;
+        public static Dropdown? ActiveDropdown;
         public static int SinceDropdownWasActive = 0;
 
         /// <inheritdoc />
@@ -65,10 +65,13 @@ namespace ValleyReminders.ui
             {
                 justClicked = true;
                 this.Dropped = true;
-                this.Parent.RenderLast = this;
+                if(Parent != null)
+                {
+                    Parent.RenderLast = this;
+                }
             }
 
-            if (this.Dropped)
+            if (Dropped)
             {
                 //if (Mouse.GetState().LeftButton == ButtonState.Released)
                 if (Constants.TargetPlatform != GamePlatform.Android)
@@ -78,9 +81,9 @@ namespace ValleyReminders.ui
                         && !justClicked)
                     {
                         Game1.playSound("drumkit6");
-                        this.Dropped = false;
-                        if (this.Parent.RenderLast == this)
-                            this.Parent.RenderLast = null;
+                        Dropped = false;
+                        if (Parent?.RenderLast == this)
+                            Parent.RenderLast = null;
                     }
                 }
                 else
@@ -90,9 +93,9 @@ namespace ValleyReminders.ui
                         && !justClicked)
                     {
                         Game1.playSound("drumkit6");
-                        this.Dropped = false;
-                        if (this.Parent.RenderLast == this)
-                            this.Parent.RenderLast = null;
+                        Dropped = false;
+                        if (Parent?.RenderLast == this)
+                            Parent.RenderLast = null;
                     }
                 }
 

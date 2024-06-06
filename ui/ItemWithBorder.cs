@@ -13,17 +13,17 @@ namespace ValleyReminders.ui
 {
     internal class ItemWithBorder : Element
     {
-        public static ItemWithBorder HoveredElement { get; private set; }
+        public static ItemWithBorder? HoveredElement { get; private set; }
 
-        public Item ItemDisplay { get; set; }
+        public Item? ItemDisplay { get; set; }
 
         public bool TransparentItemDisplay { get; set; } = false;
 
         public Color? BoxColor { get; set; } = Color.White;
         public bool BoxIsThin { get; set; } = false;
 
-        public Action<Element> Callback { get; set; }
-        public Action<Element> SecondaryCallback { get; set; }
+        public Action<Element>? Callback { get; set; }
+        public Action<Element>? SecondaryCallback { get; set; }
 
         public override int Width => Game1.tileSize + (BoxIsThin ? 0 : 16) * 2;
         public override int Height => Game1.tileSize + (BoxIsThin ? 0 : 16) * 2;
@@ -56,8 +56,7 @@ namespace ValleyReminders.ui
                 else
                     IClickableMenu.drawTextureBox(b, (int)Position.X, (int)Position.Y, Width, Height, BoxColor.Value);
             }
-            if ( ItemDisplay != null )
-                ItemDisplay.drawInMenu( b, Position + (BoxIsThin ? Vector2.Zero : new Vector2( 16, 16 )), 1, TransparentItemDisplay ? 0.5f : 1, 1 );
+            ItemDisplay?.drawInMenu( b, Position + (BoxIsThin ? Vector2.Zero : new Vector2( 16, 16 )), 1, TransparentItemDisplay ? 0.5f : 1, 1 );
         }
     }
 }
