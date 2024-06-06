@@ -70,7 +70,7 @@ namespace ValleyReminders.ui
             }
 
             bool newHover = !hidden && !GetRoot().Obscured && Bounds.Contains(mouseX, mouseY);
-            if (newHover && !Hover && HoveredSound != null)
+            if (newHover && !Hover && HoveredSound != string.Empty)
                 Game1.playSound(HoveredSound);
             Hover = newHover;
 
@@ -80,7 +80,7 @@ namespace ValleyReminders.ui
             {
                 ClickGestured = false;
             }
-            if (Clicked && ClickedSound != null)
+            if (Clicked && ClickedSound != string.Empty)
                 Game1.playSound(ClickedSound);
         }
 

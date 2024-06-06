@@ -271,7 +271,7 @@ namespace ValleyReminders
         {
             base.receiveLeftClick(x, y, playSound);
         }
- 
+
         public override void draw(SpriteBatch b)
         {
             switch (state)

@@ -122,14 +122,14 @@ namespace ValleyReminders
         private void OnSaveLoaded(object? sender, SaveLoadedEventArgs e)
         {
             //activeReminders = Utilities.LoadReminders(SAVE_KEY);
-            Monitor.Log("Reminders loaded!", LogLevel.Info);
+            Monitor.Log("Reminders loaded!");
 
             menu.CreateInterface(activeReminders);
         }
 
         private void OnSaving(object? sender, SavingEventArgs e)
         {
-            Monitor.Log($"Removing {deleteQueue.Count} expired reminders", LogLevel.Info);
+            Monitor.Log($"Removing {deleteQueue.Count} expired reminders");
             //Delete expired reminders before writing to save
             foreach (var expiredReminder in deleteQueue)
             {
@@ -137,7 +137,7 @@ namespace ValleyReminders
             }
 
             Utilities.SaveReminders(activeReminders, SAVE_KEY);
-            Monitor.Log("Reminders saved!", LogLevel.Info);
+            Monitor.Log("Reminders saved!");
         }
 
         private void OnDayStarted(object? sender, DayStartedEventArgs e)
@@ -158,7 +158,7 @@ namespace ValleyReminders
                 if (reminder.IsReadyToNotify())
                 {
                     reminder.Notify();
-                    Monitor.Log($"Reminder notified: {reminder.Message}", LogLevel.Info);
+                    Monitor.Log($"Reminder notified: {reminder.Message}");
 
                     if (!reminder.IsRecurring())
                     {

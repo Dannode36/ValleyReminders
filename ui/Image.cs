@@ -27,7 +27,7 @@ namespace ValleyReminders.ui
         public override int Height => (int)this.GetActualSize().Y;
 
         /// <inheritdoc />
-        public override string HoveredSound => (this.Callback != null) ? "shiny4" : null;
+        public override string HoveredSound => (this.Callback != null) ? "shiny4" : string.Empty;
 
         public Color DrawColor { get; set; } = Color.White;
 
