@@ -100,6 +100,7 @@ namespace ValleyReminders
             if (Game1.hasLoadedGame && Config.ToggleKey.JustPressed())
             {
                 Game1.activeClickableMenu = menu;
+                menu.OnOpen();
             }
         }
 

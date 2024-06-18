@@ -28,19 +28,19 @@ namespace ValleyReminders.ui
             get => renderLast;
             set {
                 renderLast = value;
-                if (this.Parent is not null) {
+                if (Parent is not null) {
                     if (value is null) {
-                        if (this.Parent.RenderLast == this) {
-                            this.Parent.RenderLast = null;
+                        if (Parent.RenderLast == this) {
+                            Parent.RenderLast = null;
                         }
                     } else {
-                        this.Parent.RenderLast = this;
+                        Parent.RenderLast = this;
                     }
                 }
             }
         }
 
-        public Element[] Children => this.ChildrenImpl.ToArray();
+        public Element[] Children => ChildrenImpl.ToArray();
 
         public bool Selected { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
@@ -51,7 +51,7 @@ namespace ValleyReminders.ui
         public void AddChild(Element element)
         {
             element.Parent?.RemoveChild(element);
-            this.ChildrenImpl.Add(element);
+            ChildrenImpl.Add(element);
             element.Parent = this;
         }
 
@@ -59,7 +59,7 @@ namespace ValleyReminders.ui
         {
             if (element.Parent != this)
                 throw new ArgumentException("Element must be a child of this container.");
-            this.ChildrenImpl.Remove(element);
+            ChildrenImpl.Remove(element);
             element.Parent = null;
         }
 
@@ -67,9 +67,9 @@ namespace ValleyReminders.ui
         public override void Update(bool isOffScreen = false)
         {
             base.Update(isOffScreen);
-            if (this.UpdateChildren)
+            if (UpdateChildren)
             {
-                foreach (var element in this.ChildrenImpl)
+                foreach (var element in ChildrenImpl)
                     element.Update(isOffScreen);
             }
         }
@@ -77,16 +77,16 @@ namespace ValleyReminders.ui
         /// <inheritdoc />
         public override void Draw(SpriteBatch b)
         {
-            if (this.IsHidden())
+            if (IsHidden())
                 return;
 
-            foreach (var child in this.ChildrenImpl)
+            foreach (var child in   ChildrenImpl)
             {
-                if (child == this.RenderLast)
+                if (child == RenderLast)
                     continue;
                 child.Draw(b);
             }
-            this.RenderLast?.Draw(b);
+            RenderLast?.Draw(b);
         }
     }
 }

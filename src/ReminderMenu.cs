@@ -24,36 +24,36 @@ namespace ValleyReminders
     {
         public const int Width = 800;
         public const int Height = 1000;
-
-        public static Vector2 Center => new((Game1.uiViewport.Width - Width) / 2, (Game1.uiViewport.Height - Height) / 2);
+        public static Vector2 CenterOffset => new((Game1.uiViewport.Width - Width) / 2, (Game1.uiViewport.Height - Height) / 2);
 
         private RootElement rootElement = new();
         private ReminderMenuState state = ReminderMenuState.LIST;
 
+        //LIST
         private Table reminderListPage = new();
         private List<Reminder> reminders = new();
         bool reminderListDirty = false;
 
+        //EDIT
         private StaticContainer reminderEditPage = new();
         private Reminder? selectedReminder = null;
 
+        //CREATE
         private Table reminderCreationPage = new();
-
-        private Image pixel = new();
 
         public void CreateInterface(List<Reminder> reminders)
         {
-            pixel = new()
-            {
-                Texture = Game1.mouseCursors,
-                TexturePixelArea = null //new(0, 0, Game1.uiViewport.Width, Game1.uiViewport.Height),
-            };
-
             this.reminders = reminders;
 
-            initialize((int)Center.X, (int)Center.Y, Width, Height, true);
+            initialize((int)CenterOffset.X, (int)CenterOffset.Y, Width, Height, true);
             CreateStaticInterface();
             UpdateReminderListPage();
+        }
+
+        public void OnOpen()
+        {
+            state = ReminderMenuState.LIST;
+            selectedReminder = null;
         }
 
         private void CreateStaticInterface()
@@ -62,7 +62,6 @@ namespace ValleyReminders
             rootElement.AddChild(reminderListPage);
             rootElement.AddChild(reminderEditPage);
             rootElement.AddChild(reminderCreationPage);
-            rootElement.AddChild(pixel);
         }
 
         public void UpdateReminderListPage()
@@ -77,7 +76,7 @@ namespace ValleyReminders
             {
                 RowHeight = 100,
                 Size = new(Width, Height),
-                LocalPosition = Center,
+                LocalPosition = CenterOffset,
             };
 
             //Reminders
@@ -88,13 +87,21 @@ namespace ValleyReminders
                     Callback = (e) => { selectedReminder = reminder; },
                     LocalPosition = new(-20, -380)
                 };
+                
                 var textBox = new Label()
                 {
-                    String = reminder.Message,
+                    String = reminder.Name,
                     Bold = true,
-                    //LocalPosition = new(Position.X, Position.Y)
+                    LocalPosition = new(0, 20)
                 };
-                reminderListPage.AddRow(new Element[] { button, textBox });
+
+                var enabledCheck = new Checkbox()
+                {
+                    Checked = reminder.Enabled,
+                    Callback = (e) => { reminder.Enabled = ((Checkbox)e).Checked; },
+                    LocalPosition = new(Width - 40, 250)
+                };
+                reminderListPage.AddRow(new Element[] { button, textBox, enabledCheck });
             }
 
             rootElement.AddChild(reminderListPage);
@@ -111,8 +118,8 @@ namespace ValleyReminders
 
             reminderEditPage = new()
             {
-                Size = new(width, height),
-                LocalPosition = Center,
+                Size = new(Width, Height),
+                LocalPosition = CenterOffset,
                 OutlineColor = Color.White
             };
 
@@ -295,6 +302,7 @@ namespace ValleyReminders
 
             if (shouldDrawCloseButton())
             {
+                //upperRightCloseButton.setPosition(upperRightCloseButton.getVector2() + new Vector2(20, 20));
                 upperRightCloseButton.draw(b);
             }
             drawMouse(b);

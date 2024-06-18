@@ -20,7 +20,6 @@ namespace ValleyReminders.ui
         private readonly bool FixedRowHeight;
         private int ContentHeight;
 
-
         /*********
         ** Accessors
         *********/
@@ -29,7 +28,7 @@ namespace ValleyReminders.ui
             get => SizeImpl;
             set
             {
-                SizeImpl = new Vector2(value.X, ((int)value.Y) / RowHeight * RowHeight);
+                SizeImpl = new Vector2(value.X, RowHeight == 0 ? 0 : ((int)value.Y) / RowHeight * RowHeight);
                 UpdateScrollbar();
             }
         }
@@ -90,24 +89,27 @@ namespace ValleyReminders.ui
             if (IsHidden(isOffScreen))
                 return;
 
-            int topPx = 0;
+            int rowTopPx = 0;
             foreach (var row in Rows)
             {
                 int maxElementHeight = 0;
                 foreach (var element in row)
                 {
-                    element.LocalPosition = new Vector2(element.LocalPosition.X, topPx - Scrollbar.TopRow * RowHeight);
+                    element.LocalPosition = new Vector2(
+                        element.LocalPosition.X, 
+                        (rowTopPx - Scrollbar.TopRow * RowHeight));
+
                     bool isChildOffScreen = isOffScreen || IsElementOffScreen(element);
 
                     if (!isChildOffScreen || element is Label) // Labels must update anyway to get rid of hovertext on scrollwheel
-                        element.Update(isOffScreen: isChildOffScreen);
+                        element.Update(isChildOffScreen);
                     maxElementHeight = Math.Max(maxElementHeight, element.Height);
                 }
-                topPx += FixedRowHeight ? RowHeight : maxElementHeight + RowPadding;
+                rowTopPx += FixedRowHeight ? RowHeight : maxElementHeight + RowPadding;
             }
 
-            if (topPx != ContentHeight) {
-                        ContentHeight = topPx;
+            if (rowTopPx != ContentHeight) {
+                        ContentHeight = rowTopPx;
                 Scrollbar.Rows = PxToRow(ContentHeight);
             }
 
@@ -174,7 +176,6 @@ namespace ValleyReminders.ui
             Scrollbar.Draw(b);
         }
 
-
         /*********
         ** Private methods
         *********/
@@ -226,7 +227,7 @@ namespace ValleyReminders.ui
 
         private int PxToRow(int px)
         {
-            return (px + RowHeight - 1) / RowHeight;
+            return RowHeight == 0 ? 0 : (px + RowHeight - 1) / RowHeight;
         }
     }
 }
