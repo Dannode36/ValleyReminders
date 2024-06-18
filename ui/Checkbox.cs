@@ -20,14 +20,13 @@ namespace ValleyReminders.ui
         public bool Checked { get; set; } = true;
 
         /// <inheritdoc />
-        public override int Width => CheckedTextureRect.Width * 4;
+        public override int Width => UncheckedTextureRect.Width * 4;
 
         /// <inheritdoc />
-        public override int Height => CheckedTextureRect.Height * 4;
+        public override int Height => UncheckedTextureRect.Height * 4;
 
         /// <inheritdoc />
         public override string ClickedSound => "drumkit6";
-
 
         /*********
         ** Public methods

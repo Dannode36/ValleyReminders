@@ -28,12 +28,17 @@ namespace ValleyReminders.ui
             get => renderLast;
             set {
                 renderLast = value;
-                if (Parent is not null) {
-                    if (value is null) {
-                        if (Parent.RenderLast == this) {
+                if (Parent != null) 
+                {
+                    if (value == null) 
+                    {
+                        if (Parent.RenderLast == this) 
+                        {
                             Parent.RenderLast = null;
                         }
-                    } else {
+                    } 
+                    else 
+                    {
                         Parent.RenderLast = this;
                     }
                 }
@@ -43,7 +48,6 @@ namespace ValleyReminders.ui
         public Element[] Children => ChildrenImpl.ToArray();
 
         public bool Selected { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-
 
         /*********
         ** Public methods
@@ -80,7 +84,7 @@ namespace ValleyReminders.ui
             if (IsHidden())
                 return;
 
-            foreach (var child in   ChildrenImpl)
+            foreach (var child in ChildrenImpl)
             {
                 if (child == RenderLast)
                     continue;

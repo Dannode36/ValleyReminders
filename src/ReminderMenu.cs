@@ -77,6 +77,7 @@ namespace ValleyReminders
                 RowHeight = 100,
                 Size = new(Width, Height),
                 LocalPosition = CenterOffset,
+                RowPadding = 0
             };
 
             //Reminders
@@ -85,22 +86,23 @@ namespace ValleyReminders
                 var button = new Button(Game1.mouseCursors, new(384, 396, 15, 15), new(Width + 40, reminderListPage.RowHeight + 4))
                 {
                     Callback = (e) => { selectedReminder = reminder; },
-                    LocalPosition = new(-20, -380)
+                    LocalPosition = new(-20, 0)
                 };
-                
+
                 var textBox = new Label()
                 {
                     String = reminder.Name,
                     Bold = true,
-                    LocalPosition = new(0, 20)
+                    //LocalPosition = new(0, 20)
                 };
 
                 var enabledCheck = new Checkbox()
                 {
                     Checked = reminder.Enabled,
                     Callback = (e) => { reminder.Enabled = ((Checkbox)e).Checked; },
-                    LocalPosition = new(Width - 40, 250)
                 };
+                enabledCheck.LocalPosition = new(Width - 40, (reminderListPage.RowHeight - enabledCheck.Height) / 2);
+
                 reminderListPage.AddRow(new Element[] { button, textBox, enabledCheck });
             }
 

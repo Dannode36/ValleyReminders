@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Xml.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
+using StardewValley.Characters;
 using StardewValley.Menus;
 
 namespace ValleyReminders.ui
@@ -12,7 +14,7 @@ namespace ValleyReminders.ui
         /*********
         ** Fields
         *********/
-        private readonly List<Element[]> Rows = new();
+        private readonly List<Row> Rows = new();
 
         private Vector2 SizeImpl;
 
@@ -55,6 +57,8 @@ namespace ValleyReminders.ui
 
         public int RowPadding { get; set; } = 16;
 
+        public int RowSlip { get; set; } = 20;
+
         /*********
         ** Public methods
         *********/
@@ -71,14 +75,14 @@ namespace ValleyReminders.ui
 
         public void AddRow(Element[] elements)
         {
-            Rows.Add(elements);
-            int maxElementHeight = 0;
-            foreach (var child in elements)
+            Row row = new(elements)
             {
-                AddChild(child);
-                maxElementHeight = Math.Max(maxElementHeight, child.Height);
-            }
-            ContentHeight += FixedRowHeight ? RowHeight : maxElementHeight + RowPadding;
+                RowHeight = RowHeightImpl
+            };
+            Rows.Add(row);
+            AddChild(row);
+
+            ContentHeight += FixedRowHeight ? RowHeight : row.MaxChildHeight + RowPadding;
             UpdateScrollbar();
         }
 
@@ -92,20 +96,12 @@ namespace ValleyReminders.ui
             int rowTopPx = 0;
             foreach (var row in Rows)
             {
-                int maxElementHeight = 0;
-                foreach (var element in row)
-                {
-                    element.LocalPosition = new Vector2(
-                        element.LocalPosition.X, 
-                        (rowTopPx - Scrollbar.TopRow * RowHeight));
+                row.LocalPosition = new(row.LocalPosition.X, rowTopPx - RowSlip - Scrollbar.TopRow * RowHeight);
 
-                    bool isChildOffScreen = isOffScreen || IsElementOffScreen(element);
+                bool isChildOffScreen = isOffScreen || IsElementOffScreen(row);
 
-                    if (!isChildOffScreen || element is Label) // Labels must update anyway to get rid of hovertext on scrollwheel
-                        element.Update(isChildOffScreen);
-                    maxElementHeight = Math.Max(maxElementHeight, element.Height);
-                }
-                rowTopPx += FixedRowHeight ? RowHeight : maxElementHeight + RowPadding;
+                row.Update(isChildOffScreen);
+                rowTopPx += FixedRowHeight ? RowHeight : row.MaxChildHeight + RowPadding;
             }
 
             if (rowTopPx != ContentHeight) {
@@ -122,7 +118,7 @@ namespace ValleyReminders.ui
             foreach (var row in Rows)
             {
                 int maxElementHeight = 0;
-                foreach (var element in row)
+                foreach (var element in row.Elements)
                 {
                     element.LocalPosition = new Vector2(element.LocalPosition.X, topPx - Scrollbar.ScrollPercent * Rows.Count * RowHeight);
                     bool isChildOffScreen = isOffScreen || IsElementOffScreen(element);
@@ -159,16 +155,16 @@ namespace ValleyReminders.ui
             {
                 foreach (var row in Rows)
                 {
-                    foreach (var element in row)
+                    if (IsElementOffScreen(row))
                     {
-                        if (IsElementOffScreen(element))
-                            continue;
-                        if (element == RenderLast) {
-                            renderLast = element;
-                            continue;
-                        }
-                        element.Draw(contentBatch);
+                        continue;
                     }
+                    if (row == RenderLast)
+                    {
+                        renderLast = row;
+                        continue;
+                    }
+                    row.Draw(contentBatch);
                 }
             });
             renderLast?.Draw(b);
