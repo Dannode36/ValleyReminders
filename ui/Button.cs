@@ -13,7 +13,6 @@ namespace ValleyReminders.ui
         *********/
         private float Scale = 1f;
 
-
         /*********
         ** Accessors
         *********/

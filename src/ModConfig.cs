@@ -10,6 +10,6 @@ namespace ValleyReminders
 {
     class ModConfig
     {
-        public KeybindList ToggleKey { get; set; } = KeybindList.Parse("LeftShift + R");
+        public KeybindList ToggleKey { get; set; } = KeybindList.Parse("LeftShift + R, R");
     }
 }

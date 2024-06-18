@@ -18,7 +18,6 @@ namespace ValleyReminders.ui
         {
             if (IsHidden())
                 return;
-
             if (OutlineColor.HasValue)
             {
                 IClickableMenu.drawTextureBox(b, (int)Position.X - 12, (int)Position.Y - 12, Width + 24, Height + 24, OutlineColor.Value);

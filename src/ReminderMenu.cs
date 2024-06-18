@@ -7,8 +7,9 @@ using StardewValley;
 using StardewValley.Menus;
 using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using ValleyReminders.ui;
-
+using ValleyReminders.ui.pickers;
 using Textbox = ValleyReminders.ui.Textbox;
 
 namespace ValleyReminders
@@ -22,8 +23,8 @@ namespace ValleyReminders
 
     class ReminderMenu : IClickableMenu
     {
-        public const int Width = 800;
-        public const int Height = 1000;
+        public const int Width = 832;
+        public const int Height = 616;
         public static Vector2 CenterOffset => new((Game1.uiViewport.Width - Width) / 2, (Game1.uiViewport.Height - Height) / 2);
 
         private RootElement rootElement = new();
@@ -46,6 +47,7 @@ namespace ValleyReminders
             this.reminders = reminders;
 
             initialize((int)CenterOffset.X, (int)CenterOffset.Y, Width, Height, true);
+            upperRightCloseButton.setPosition(new(CenterOffset.X + Width + 20, CenterOffset.Y - 40));
             CreateStaticInterface();
             UpdateReminderListPage();
         }
@@ -105,7 +107,7 @@ namespace ValleyReminders
 
                 reminderListPage.AddRow(new Element[] { button, textBox, enabledCheck });
             }
-
+            reminderListPage.AddRow(new Element[] { new DateTimePicker() });
             rootElement.AddChild(reminderListPage);
             reminderListDirty = false;
         }
@@ -160,7 +162,7 @@ namespace ValleyReminders
                 {
                     var conditionName = new Label()
                     {
-                        String = cond.MethodName,
+                        String = Regex.Replace(cond.MethodName, "([A-Z]+(?=$|[A-Z][a-z])|[A-Z]?[a-z]+)", " $1"),
                         Font = Game1.smallFont
                     };
 
