@@ -153,8 +153,9 @@ namespace ValleyReminders
             {
                 var conditions = new Table()
                 {
-                    RowHeight = 100,
-                    Size = new(width, height)
+                    RowHeight = 60,
+                    Size = new(width, height),
+                    RowSlip = 0
                 };
 
                 //Display conditions

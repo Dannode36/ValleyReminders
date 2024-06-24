@@ -33,7 +33,7 @@ namespace ValleyReminders.ui
 
         /// <inheritdoc />
         public override string HoveredSound => (Callback != null) ? "shiny4" : string.Empty;
-
+        public override bool Clickable { get; set; } = false;
 
         /*********
         ** Public methods

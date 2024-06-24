@@ -49,6 +49,8 @@ namespace ValleyReminders.ui
 
         public bool Selected { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
+        public bool ClickConsumed = false;
+
         /*********
         ** Public methods
         *********/
@@ -70,11 +72,15 @@ namespace ValleyReminders.ui
         /// <inheritdoc />
         public override void Update(bool isOffScreen = false)
         {
+            ClickConsumed = false;
             base.Update(isOffScreen);
             if (UpdateChildren)
             {
-                foreach (var element in ChildrenImpl)
-                    element.Update(isOffScreen);
+                for (int i = ChildrenImpl.Count - (1); i >= 0; i--)
+                {
+                    ChildrenImpl[i].Update(isOffScreen);
+
+                }
             }
         }
 

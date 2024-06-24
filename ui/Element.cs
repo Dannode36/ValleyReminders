@@ -33,6 +33,7 @@ namespace ValleyReminders.ui
         public bool Hover { get; private set; }
         public virtual string HoveredSound => string.Empty;
 
+        public virtual bool Clickable { get; set; } = true;
         public bool ClickGestured { get; private set; }
         public bool Clicked => Hover && ClickGestured;
         public virtual string ClickedSound => string.Empty;
@@ -74,14 +75,31 @@ namespace ValleyReminders.ui
                 Game1.playSound(HoveredSound);
             Hover = newHover;
 
-            ClickGestured = (Game1.input.GetMouseState().LeftButton == ButtonState.Pressed && Game1.oldMouseState.LeftButton == ButtonState.Released);
-            ClickGestured = ClickGestured || (Game1.options.gamepadControls && (Game1.input.GetGamePadState().IsButtonDown(Buttons.A) && !Game1.oldPadState.IsButtonDown(Buttons.A)));
-            if (ClickGestured && (Dropdown.SinceDropdownWasActive > 0 || Dropdown.ActiveDropdown != null))
+            if(Clickable)
             {
-                ClickGestured = false;
+                ClickGestured = Game1.input.GetMouseState().LeftButton == ButtonState.Pressed && Game1.oldMouseState.LeftButton == ButtonState.Released;
+                ClickGestured = ClickGestured || (Game1.options.gamepadControls && (Game1.input.GetGamePadState().IsButtonDown(Buttons.A) && !Game1.oldPadState.IsButtonDown(Buttons.A)));
+                if (Clicked)
+                {
+                    if (Parent != null)
+                    {
+                        ValleyReminders.Utilities.Monitor.Log($"Click gestured: {ClickGestured}");
+                        ValleyReminders.Utilities.Monitor.Log($"Parent click consumed: {Parent.ClickConsumed}");
+                        ValleyReminders.Utilities.Monitor.Log($"Type: {GetType().Name}");
+                        ValleyReminders.Utilities.Monitor.Log("");
+                        ClickGestured = !Parent.ClickConsumed; //If a click was already consumed, we have not actually been clicked
+                        Parent.ClickConsumed = Parent.ClickConsumed || ClickGestured; //If the click has just been consumed, update the parent, otherwise it reassigns the same value
+                    }
+
+                    if ((Dropdown.SinceDropdownWasActive > 0 || Dropdown.ActiveDropdown != null))
+                    {
+                        ClickGestured = false;
+                    }
+                }
+
+                if (Clicked && ClickedSound != string.Empty)
+                    Game1.playSound(ClickedSound);
             }
-            if (Clicked && ClickedSound != string.Empty)
-                Game1.playSound(ClickedSound);
         }
 
         public abstract void Draw(SpriteBatch b);
