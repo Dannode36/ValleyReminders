@@ -124,7 +124,6 @@ namespace ValleyReminders
             {
                 Size = new(Width, Height),
                 LocalPosition = CenterOffset,
-                OutlineColor = Color.White
             };
 
             var msgTextBox = new Textbox()
@@ -238,7 +237,7 @@ namespace ValleyReminders
             //Menu buttons
             var backButton = new Button(Game1.mouseCursors, new(352, 495, 12, 11), new(48, 44))
             {
-                LocalPosition = new Vector2(200, 200),
+                LocalPosition = new Vector2(-52, 44),
                 Callback = (e) => { this.selectedReminder = null; state = ReminderMenuState.LIST; }
             };
             reminderEditPage.AddChild(backButton);
