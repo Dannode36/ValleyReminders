@@ -8,9 +8,8 @@ using StardewValley.Menus;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using ValleyReminders.ui;
-using ValleyReminders.ui.pickers;
-using Textbox = ValleyReminders.ui.Textbox;
+using SMUI.Elements;
+using SMUI.Elements.Pickers;
 
 namespace ValleyReminders
 {

@@ -16,6 +16,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="SMUI">
+      <HintPath>..\SMUI\bin\Debug\net6.0\SMUI.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="assets\button.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
