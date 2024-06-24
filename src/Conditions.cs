@@ -3,7 +3,7 @@ using StardewValley;
 using System.Reflection;
 
 //Represents a list of parameter names paired to their corresponding type
-using ParameterList = System.Collections.Generic.List<System.Collections.Generic.KeyValuePair<string, ValleyReminders.ParameterType>>;
+using ParameterData = System.Collections.Generic.KeyValuePair<string, ValleyReminders.ParameterType>;
 
 namespace ValleyReminders
 {
@@ -17,11 +17,11 @@ namespace ValleyReminders
 
     static class Conditions
     {
-        public static SortedDictionary<string, ParameterList> conditionFunctions = new();
+        public static SortedDictionary<string, List<ParameterData>> conditionFunctions = new();
 
-        public static ParameterList GetParameterList(string methodName)
+        public static List<ParameterData> GetParameterList(string methodName)
         {
-            ParameterList parameterList = new();
+            List<ParameterData> parameterList = new();
 
             try
             {
@@ -44,7 +44,7 @@ namespace ValleyReminders
 
         public static int GetParameterCount(string methodName)
         {
-            return GetParameterNames(methodName).Length;
+            return typeof(Conditions).GetMethod(methodName)?.GetParameters()?.Select(x => x.Name).Count() ?? 0;
         }
 
         public static string?[] GetParameterNames(string methodName)

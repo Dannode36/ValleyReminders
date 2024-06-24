@@ -10,6 +10,9 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using SMUI.Elements;
 using SMUI.Elements.Pickers;
+using System.Reflection;
+using System.Reflection.Metadata;
+using ParameterData = System.Collections.Generic.KeyValuePair<string, ValleyReminders.ParameterType>;
 
 namespace ValleyReminders
 {
@@ -156,6 +159,7 @@ namespace ValleyReminders
                     Size = new(width, height),
                     RowSlip = 0
                 };
+                const int parameterMargin = 25;
 
                 //Display conditions
                 foreach (var cond in selectedReminder.Conditions)
@@ -171,9 +175,9 @@ namespace ValleyReminders
                     //Display condition parameters names and inputs
                     int i = 0;
                     int previousWidth = conditionName.Width;
-                    foreach (var condParameter in Conditions.GetParameterList(cond.MethodName))
+                    foreach (ParameterData condParameter in Conditions.GetParameterList(cond.MethodName))
                     {
-                        if(Conditions.GetParameterList(cond.MethodName).Count > 1)
+                        if(Conditions.GetParameterCount(cond.MethodName) > 1)
                         {
                             var condParameterLabel = new Label()
                             {
@@ -192,7 +196,8 @@ namespace ValleyReminders
                                 Textbox condParameterTextBox = new()
                                 {
                                     String = cond.ParameterValues[i],
-                                    Callback = (e) => {
+                                    Callback = (e) => 
+                                    {
                                         cond.ParameterValues[parameterIndex] = (e as Textbox)!.String;
                                     },
                                     LocalPosition = new(previousWidth + 25, 0)
@@ -204,8 +209,9 @@ namespace ValleyReminders
                                 Intbox condParameterIntBox = new()
                                 {
                                     String = cond.ParameterValues[i],
-                                    Callback = (e) => {
-                                        cond.ParameterValues[parameterIndex] = (e as Intbox)!.Value.ToString();
+                                    Callback = (e) => 
+                                    {
+                                        cond.ParameterValues[parameterIndex] = (e as Intbox)!.String;
                                     },
                                     LocalPosition = new(previousWidth + 25, 0)
                                 };
@@ -216,8 +222,9 @@ namespace ValleyReminders
                                 Floatbox condParameterFloatBox = new()
                                 {
                                     String = cond.ParameterValues[i],
-                                    Callback = (e) => {
-                                        cond.ParameterValues[parameterIndex] = (e as Floatbox)!.Value.ToString();
+                                    Callback = (e) => 
+                                    {
+                                        cond.ParameterValues[parameterIndex] = (e as Floatbox)!.String;
                                     },
                                     LocalPosition = new(previousWidth + 25, 0)
                                 };
