@@ -54,6 +54,7 @@ namespace ValleyReminders
 
         public void OnOpen()
         {
+            reminderListDirty = true;
             state = ReminderMenuState.LIST;
             selectedReminder = null;
         }
@@ -93,9 +94,9 @@ namespace ValleyReminders
 
                 var textBox = new Label()
                 {
-                    String = reminder.Name,
+                    String = reminder.Name.Truncate(34),
                     Bold = true,
-                    //LocalPosition = new(0, 20)
+                    LocalPosition = new(0, 36)
                 };
 
                 var enabledCheck = new Checkbox()
@@ -237,7 +238,7 @@ namespace ValleyReminders
             //Menu buttons
             var backButton = new Button(Game1.mouseCursors, new(352, 495, 12, 11), new(48, 44))
             {
-                LocalPosition = new Vector2(-52, 44),
+                LocalPosition = new Vector2(-96, -22),
                 Callback = (e) => { this.selectedReminder = null; state = ReminderMenuState.LIST; }
             };
             reminderEditPage.AddChild(backButton);

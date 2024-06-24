@@ -28,5 +28,10 @@ namespace ValleyReminders
             List<Reminder>? reminders = Helper.Data.ReadSaveData<List<Reminder>>(key);
             return reminders ?? new(); //Create an empty list if save data does not contain the list
         }
+
+        public static string Truncate(this string value, int maxChars)
+        {
+            return value.Length <= maxChars ? value : value[..(maxChars - 2)] + "...";
+        }
     }
 }

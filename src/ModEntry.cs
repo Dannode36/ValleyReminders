@@ -21,6 +21,7 @@ namespace ValleyReminders
             new("This is a reccuring alarm for 6:10am", 0, 610),
             new("This is a reflection strainer", 0, 620, 1, new()
             {
+                new("HasSkillLevel", new(){"0", "0"}),
                 new("IsDay", new(){ "8" }),
                 new("IsSeason", new(){ "Spring" }),
                 new("IsYear", new() { "1" }),
@@ -108,7 +109,7 @@ namespace ValleyReminders
         {
             if (Game1.hasLoadedGame && Game1.activeClickableMenu is ReminderMenu menu)
             {
-                menu.receiveScrollWheelAction(e.Delta);
+                menu.receiveScrollWheelAction(-e.Delta);
             }
         }
 
