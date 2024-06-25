@@ -68,6 +68,7 @@ namespace ValleyReminders
             rootElement.AddChild(reminderEditPage);
             rootElement.AddChild(reminderCreationPage);
         }
+        // 322, 498 - 12, 12
 
         public void UpdateReminderListPage()
         {
@@ -106,9 +107,15 @@ namespace ValleyReminders
                     Checked = reminder.Enabled,
                     Callback = (e) => { reminder.Enabled = ((Checkbox)e).Checked; },
                 };
-                enabledCheck.LocalPosition = new(Width - 40, (reminderListPage.RowHeight - enabledCheck.Height) / 2);
+                enabledCheck.LocalPosition = new(Width - 40, (reminderListPage.RowHeight - enabledCheck.Height) / 2 -24);
 
-                reminderListPage.AddRow(new Element[] { button, textBox, enabledCheck });
+                var deleteButton = new Button(Game1.mouseCursors, new(322, 498, 12, 12), new(48, 48))
+                {
+                    Callback = (e) => { reminders.Remove(reminder); reminderListDirty = true; },
+                };
+                deleteButton.LocalPosition = new(Width - 46, (reminderListPage.RowHeight - deleteButton.Height) / 2 + 22);
+
+                reminderListPage.AddRow(new Element[] { button, textBox, enabledCheck, deleteButton });
             }
             reminderListPage.AddRow(new Element[] { new DateTimePicker() });
             rootElement.AddChild(reminderListPage);
@@ -246,9 +253,20 @@ namespace ValleyReminders
             var backButton = new Button(Game1.mouseCursors, new(352, 495, 12, 11), new(48, 44))
             {
                 LocalPosition = new Vector2(-96, -22),
-                Callback = (e) => { this.selectedReminder = null; state = ReminderMenuState.LIST; }
+                Callback = (e) => { this.selectedReminder = null; }
             };
             reminderEditPage.AddChild(backButton);
+
+            var slider = new Slider<float>()
+            {
+                Callback = (e) => { Utilities.Monitor.Log($"Slider value: {(e as Slider<float>)?.Value}"); },
+                Interval = 0.5f,
+                Maximum = 100,
+                Minimum = -100,
+                RequestWidth = 100,
+            };
+
+            reminderEditPage.AddChild(slider);
 
             rootElement.AddChild(reminderEditPage);
         }
@@ -259,8 +277,16 @@ namespace ValleyReminders
 
             if(selectedReminder != null && state != ReminderMenuState.EDIT)
             {
-                state = ReminderMenuState.EDIT;
                 UpdateReminderEditPage(selectedReminder);
+                state = ReminderMenuState.EDIT;
+            }
+            else if (/*TODO*/ state == ReminderMenuState.CREATE)
+            {
+
+            }
+            else if (selectedReminder == null)
+            {
+                state = ReminderMenuState.LIST;
             }
 
             switch (state)
