@@ -9,16 +9,11 @@
 
   <ItemGroup>
     <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="4.1.1" />
+    <PackageReference Include="SMUI" Version="0.1.0" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="assets\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="SMUI">
-      <HintPath>..\SMUI\bin\Release\net6.0\SMUI.dll</HintPath>
-    </Reference>
   </ItemGroup>
 
   <ItemGroup>
