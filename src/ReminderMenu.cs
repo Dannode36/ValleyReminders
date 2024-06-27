@@ -109,11 +109,12 @@ namespace ValleyReminders
                 };
                 enabledCheck.LocalPosition = new(Width - 40, (reminderListPage.RowHeight - enabledCheck.Height) / 2 -24);
 
-                var deleteButton = new Button(Game1.mouseCursors, new(322, 498, 12, 12), new(48, 48))
+                var deleteButton = new Button(Game1.mouseCursors, new(322, 498, 12, 12), new(36, 36))
                 {
                     Callback = (e) => { reminders.Remove(reminder); reminderListDirty = true; },
+                    Scale = 3f
                 };
-                deleteButton.LocalPosition = new(Width - 46, (reminderListPage.RowHeight - deleteButton.Height) / 2 + 22);
+                deleteButton.LocalPosition = new(Width - 40, (reminderListPage.RowHeight - deleteButton.Height) / 2 + 22);
 
                 reminderListPage.AddRow(new Element[] { button, textBox, enabledCheck, deleteButton });
             }
@@ -159,95 +160,95 @@ namespace ValleyReminders
             reminderEditPage.AddChild(enabledCheckbox);
 
             //Reminder conditions table
+            var conditions = new Table()
             {
-                var conditions = new Table()
+                RowHeight = 60,
+                Size = new(width, height),
+                RowSlip = 0
+            };
+            const int parameterMargin = 25; //for when condition input will be updated in reverse
+
+            conditions.AddRow(new Element[] { new DateTimePicker() });
+
+            //Display conditions
+            foreach (var cond in selectedReminder.Conditions)
+            {
+                var conditionName = new Label()
                 {
-                    RowHeight = 60,
-                    Size = new(width, height),
-                    RowSlip = 0
+                    String = Regex.Replace(cond.MethodName, "([A-Z]+(?=$|[A-Z][a-z])|[A-Z]?[a-z]+)", " $1"),
+                    Font = Game1.smallFont
                 };
-                const int parameterMargin = 25;
 
-                //Display conditions
-                foreach (var cond in selectedReminder.Conditions)
+                List<Element> row = new();
+
+                //Display condition parameters names and inputs
+                int i = 0;
+                int previousWidth = conditionName.Width;
+                foreach (ParameterData condParameter in Conditions.GetParameterList(cond.MethodName))
                 {
-                    var conditionName = new Label()
+                    if (Conditions.GetParameterCount(cond.MethodName) > 1)
                     {
-                        String = Regex.Replace(cond.MethodName, "([A-Z]+(?=$|[A-Z][a-z])|[A-Z]?[a-z]+)", " $1"),
-                        Font = Game1.smallFont
-                    };
-
-                    List<Element> row = new();
-
-                    //Display condition parameters names and inputs
-                    int i = 0;
-                    int previousWidth = conditionName.Width;
-                    foreach (ParameterData condParameter in Conditions.GetParameterList(cond.MethodName))
-                    {
-                        if(Conditions.GetParameterCount(cond.MethodName) > 1)
+                        var condParameterLabel = new Label()
                         {
-                            var condParameterLabel = new Label()
+                            String = condParameter.Key,
+                            Font = Game1.smallFont,
+                            LocalPosition = new(previousWidth + 25, 0)
+                        };
+                        previousWidth += condParameterLabel.Width + 25;
+                        row.Add(condParameterLabel);
+                    }
+
+                    int parameterIndex = i; //Temporary variable for lambda capture or ArgumentOutOfRangeException is bound to happen
+                    switch (condParameter.Value)
+                    {
+                        case ParameterType.String:
+                            Textbox condParameterTextBox = new()
                             {
-                                String = condParameter.Key,
-                                Font = Game1.smallFont,
+                                String = cond.ParameterValues[i],
+                                Callback = (e) =>
+                                {
+                                    cond.ParameterValues[parameterIndex] = (e as Textbox)!.String;
+                                },
                                 LocalPosition = new(previousWidth + 25, 0)
                             };
-                            previousWidth += condParameterLabel.Width + 25;
-                            row.Add(condParameterLabel);
-                        }
-
-                        int parameterIndex = i; //Temporary variable for lambda capture or ArgumentOutOfRangeException is bound to happen
-                        switch (condParameter.Value)
-                        {
-                            case ParameterType.String:
-                                Textbox condParameterTextBox = new()
+                            previousWidth += condParameterTextBox.Width + 25;
+                            row.Add(condParameterTextBox);
+                            break;
+                        case ParameterType.Int:
+                            Intbox condParameterIntBox = new()
+                            {
+                                String = cond.ParameterValues[i],
+                                Callback = (e) =>
                                 {
-                                    String = cond.ParameterValues[i],
-                                    Callback = (e) => 
-                                    {
-                                        cond.ParameterValues[parameterIndex] = (e as Textbox)!.String;
-                                    },
-                                    LocalPosition = new(previousWidth + 25, 0)
-                                };
-                                previousWidth += condParameterTextBox.Width + 25;
-                                row.Add(condParameterTextBox);
-                                break;
-                            case ParameterType.Int:
-                                Intbox condParameterIntBox = new()
+                                    cond.ParameterValues[parameterIndex] = (e as Intbox)!.String;
+                                },
+                                LocalPosition = new(previousWidth + 25, 0)
+                            };
+                            previousWidth += condParameterIntBox.Width + 25;
+                            row.Add(condParameterIntBox);
+                            break;
+                        case ParameterType.Float:
+                            Floatbox condParameterFloatBox = new()
+                            {
+                                String = cond.ParameterValues[i],
+                                Callback = (e) =>
                                 {
-                                    String = cond.ParameterValues[i],
-                                    Callback = (e) => 
-                                    {
-                                        cond.ParameterValues[parameterIndex] = (e as Intbox)!.String;
-                                    },
-                                    LocalPosition = new(previousWidth + 25, 0)
-                                };
-                                previousWidth += condParameterIntBox.Width + 25;
-                                row.Add(condParameterIntBox);
-                                break;
-                            case ParameterType.Float:
-                                Floatbox condParameterFloatBox = new()
-                                {
-                                    String = cond.ParameterValues[i],
-                                    Callback = (e) => 
-                                    {
-                                        cond.ParameterValues[parameterIndex] = (e as Floatbox)!.String;
-                                    },
-                                    LocalPosition = new(previousWidth + 25, 0)
-                                };
-                                previousWidth += condParameterFloatBox.Width + 25;
-                                row.Add(condParameterFloatBox);
-                                break;
-                            default:
-                                throw new ArgumentException("Parameter type enum was not a known value");
-                        }
-                        i++;
+                                    cond.ParameterValues[parameterIndex] = (e as Floatbox)!.String;
+                                },
+                                LocalPosition = new(previousWidth + 25, 0)
+                            };
+                            previousWidth += condParameterFloatBox.Width + 25;
+                            row.Add(condParameterFloatBox);
+                            break;
+                        default:
+                            throw new ArgumentException("Parameter type enum was not a known value");
                     }
-                    row.Add(conditionName);
-                    conditions.AddRow(row.ToArray());
+                    i++;
                 }
-                reminderEditPage.AddChild(conditions);
+                row.Add(conditionName);
+                conditions.AddRow(row.ToArray());
             }
+            reminderEditPage.AddChild(conditions);
 
             //Menu buttons
             var backButton = new Button(Game1.mouseCursors, new(352, 495, 12, 11), new(48, 44))
@@ -256,17 +257,6 @@ namespace ValleyReminders
                 Callback = (e) => { this.selectedReminder = null; }
             };
             reminderEditPage.AddChild(backButton);
-
-            var slider = new Slider<float>()
-            {
-                Callback = (e) => { Utilities.Monitor.Log($"Slider value: {(e as Slider<float>)?.Value}"); },
-                Interval = 0.5f,
-                Maximum = 100,
-                Minimum = -100,
-                RequestWidth = 100,
-            };
-
-            reminderEditPage.AddChild(slider);
 
             rootElement.AddChild(reminderEditPage);
         }
@@ -333,13 +323,8 @@ namespace ValleyReminders
                     break;
             }
 
-            //pixel.Draw(b);
-            //b.Draw(Game1.mouseCursors, new Vector2(0, 0), null, Color.White);
-            //drawTextureBox(b, 0, 0, Game1.uiViewport.Width, Game1.uiViewport.Height, Color.White);
-
             if (shouldDrawCloseButton())
             {
-                //upperRightCloseButton.setPosition(upperRightCloseButton.getVector2() + new Vector2(20, 20));
                 upperRightCloseButton.draw(b);
             }
             drawMouse(b);
