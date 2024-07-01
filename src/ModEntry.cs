@@ -19,20 +19,20 @@ namespace ValleyReminders
         public List<Reminder> activeReminders = new()
         {
             new("This is a reccuring alarm for 6:10am", 0, 610),
-            new("This is a reflection strainer", 0, 620, 1, new()
+            new("This is alarm 2", 0, 620, 1, new()
             {
                 new("HasSkillLevel", new(){"0", "0"}),
                 new("IsDay", new(){ "8" }),
                 new("IsSeason", new(){ "Spring" }),
                 new("IsYear", new() { "1" }),
             }),
-            new("This is a reflection strainer 2", 0, 630, 1, new()
+            new("This is alarm 3", 0, 630, 1, new()
             {
                 new("IsDay", new() { "8" }),
                 new("IsSeason", new() { "Spring" }),
                 new("IsYear", new() { "1" }),
             }),
-            new("This is a reflection strainer 3", 0, 640, 1, new()
+            new("This is alarm 4", 0, 640, 1, new()
             {
                 new("IsDay", new() { "8" }),
                 new("IsSeason", new() { "Spring" }),
