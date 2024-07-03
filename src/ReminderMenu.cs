@@ -68,7 +68,6 @@ namespace ValleyReminders
             rootElement.AddChild(reminderEditPage);
             rootElement.AddChild(reminderCreationPage);
         }
-        // 322, 498 - 12, 12
 
         public void UpdateReminderListPage()
         {
@@ -109,7 +108,7 @@ namespace ValleyReminders
                 };
                 enabledCheck.LocalPosition = new(Width - 40, (reminderListPage.RowHeight - enabledCheck.Height) / 2 -24);
 
-                var deleteButton = new Button(Game1.mouseCursors, new(322, 498, 12, 12), new(36, 36))
+                var deleteButton = new Button(Game1.mouseCursors, new(322, 498, 12, 12), new(48, 48))
                 {
                     Callback = (e) => { reminders.Remove(reminder); reminderListDirty = true; },
                     Scale = 3f
