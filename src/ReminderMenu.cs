@@ -278,21 +278,27 @@ namespace ValleyReminders
                 state = ReminderMenuState.LIST;
             }
 
+
+            reminderListPage.Enabled = false;
+            reminderEditPage.Enabled = false;
+            reminderCreationPage.Enabled = false;
+
             switch (state)
             {
                 case ReminderMenuState.LIST:
-                    if (reminderListDirty) UpdateReminderListPage();
-                    reminderListPage.Update();
+                    reminderListPage.Enabled = true;
                     break;
                 case ReminderMenuState.EDIT:
-                    reminderEditPage.Update();
+                    reminderEditPage.Enabled = true;
                     break;
                 case ReminderMenuState.CREATE:
-                    reminderCreationPage.Update();
+                    reminderEditPage.Enabled = true;
                     break;
                 default:
                     break;
             }
+
+            rootElement.Update();
         }
 
         public override void receiveScrollWheelAction(int direction)
