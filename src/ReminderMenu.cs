@@ -1,17 +1,10 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-using StardewModdingAPI;
-using StardewModdingAPI.Utilities;
 using StardewValley;
 using StardewValley.Menus;
-using System;
-using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using SMUI.Elements;
 using SMUI.Elements.Pickers;
-using System.Reflection;
-using System.Reflection.Metadata;
 using ParameterData = System.Collections.Generic.KeyValuePair<string, ValleyReminders.ParameterType>;
 
 namespace ValleyReminders
@@ -117,6 +110,10 @@ namespace ValleyReminders
 
                 reminderListPage.AddRow(new Element[] { button, textBox, enabledCheck, deleteButton });
             }
+            var dpicker = new DateTimePicker
+            {
+                GhostInterval = 3
+            };
             reminderListPage.AddRow(new Element[] { new DateTimePicker() });
             rootElement.AddChild(reminderListPage);
             reminderListDirty = false;
