@@ -104,7 +104,6 @@ namespace ValleyReminders
                 var deleteButton = new Button(Game1.mouseCursors, new(322, 498, 12, 12), new(48, 48))
                 {
                     Callback = (e) => { reminders.Remove(reminder); reminderListDirty = true; },
-                    Scale = 3f
                 };
                 deleteButton.LocalPosition = new(Width - 40, (reminderListPage.RowHeight - deleteButton.Height) / 2 + 22);
 
@@ -138,7 +137,7 @@ namespace ValleyReminders
                 String = selectedReminder.Message,
                 Callback = (e) =>
                 {
-                    selectedReminder.Message = (e as Textbox)!.String;
+                    selectedReminder.Message = e.String;
                     reminderListDirty = true;
                 }
             };
@@ -203,7 +202,7 @@ namespace ValleyReminders
                                 String = cond.ParameterValues[i],
                                 Callback = (e) =>
                                 {
-                                    cond.ParameterValues[parameterIndex] = (e as Textbox)!.String;
+                                    cond.ParameterValues[parameterIndex] = e.String;
                                 },
                                 LocalPosition = new(previousWidth + 25, 0)
                             };
@@ -216,7 +215,7 @@ namespace ValleyReminders
                                 String = cond.ParameterValues[i],
                                 Callback = (e) =>
                                 {
-                                    cond.ParameterValues[parameterIndex] = (e as Intbox)!.String;
+                                    cond.ParameterValues[parameterIndex] = e.String;
                                 },
                                 LocalPosition = new(previousWidth + 25, 0)
                             };
@@ -229,7 +228,7 @@ namespace ValleyReminders
                                 String = cond.ParameterValues[i],
                                 Callback = (e) =>
                                 {
-                                    cond.ParameterValues[parameterIndex] = (e as Floatbox)!.String;
+                                    cond.ParameterValues[parameterIndex] = e.String;
                                 },
                                 LocalPosition = new(previousWidth + 25, 0)
                             };
@@ -237,7 +236,7 @@ namespace ValleyReminders
                             row.Add(condParameterFloatBox);
                             break;
                         default:
-                            throw new ArgumentException("Parameter type enum was not a known value");
+                            throw new ArgumentException("Parameter type enum was not a known value. Please contanct mod author");
                     }
                     i++;
                 }
@@ -272,6 +271,7 @@ namespace ValleyReminders
             }
             else if (selectedReminder == null)
             {
+                if (reminderListDirty) { UpdateReminderListPage(); }
                 state = ReminderMenuState.LIST;
             }
 
