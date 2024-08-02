@@ -35,7 +35,8 @@ namespace ValleyReminders
         private Reminder? selectedReminder = null;
 
         //CREATE
-        private Table reminderCreationPage = new();
+        private StaticContainer reminderCreatePage = new();
+        private Reminder? newReminder = null;
 
         public void CreateInterface(List<Reminder> reminders)
         {
@@ -44,7 +45,7 @@ namespace ValleyReminders
             initialize((int)CenterOffset.X, (int)CenterOffset.Y, Width, Height, true);
             upperRightCloseButton.setPosition(new(CenterOffset.X + Width + 20, CenterOffset.Y - 40));
             CreateStaticInterface();
-            UpdateReminderListPage();
+            UpdateListPage();
         }
 
         public void OnOpen()
@@ -52,6 +53,7 @@ namespace ValleyReminders
             reminderListDirty = true;
             state = ReminderMenuState.LIST;
             selectedReminder = null;
+            newReminder = null;
         }
 
         private void CreateStaticInterface()
@@ -59,16 +61,12 @@ namespace ValleyReminders
             rootElement = new();
             rootElement.AddChild(reminderListPage);
             rootElement.AddChild(reminderEditPage);
-            rootElement.AddChild(reminderCreationPage);
+            rootElement.AddChild(reminderCreatePage);
         }
 
-        public void UpdateReminderListPage()
+        public void UpdateListPage()
         {
-            try
-            {
-                rootElement.RemoveChild(reminderListPage);
-            }
-            catch (ArgumentException) { /* Do nothing */ }
+            rootElement.RemoveChild(reminderListPage);
 
             reminderListPage = new()
             {
@@ -78,11 +76,29 @@ namespace ValleyReminders
                 RowPadding = 0
             };
 
+            //Create button
+            var createButton = new Button(Game1.mouseCursors, new(384, 396, 15, 15))
+            {
+                Size = new(Width + 40, reminderListPage.RowHeight + 4),
+                Callback = (e) => { newReminder = new(); },
+                LocalPosition = new(-20, 0)
+            };
+
+            var createButtonPlus = new Image()
+            {
+                Texture = Game1.mouseCursors,
+                TextureArea = new(1, 412, 14, 14),
+            };
+            createButtonPlus.LocalPosition = new((createButton.Width - createButtonPlus.Width) / 2, 36);
+
+            reminderListPage.AddRow(new Element[] { createButton, createButtonPlus });
+
             //Reminders
             foreach (Reminder reminder in reminders)
             {
-                var button = new Button(Game1.mouseCursors, new(384, 396, 15, 15), new(Width + 40, reminderListPage.RowHeight + 4))
+                var button = new Button(Game1.mouseCursors, new(384, 396, 15, 15))
                 {
+                    Size = new(Width + 40, reminderListPage.RowHeight + 4),
                     Callback = (e) => { selectedReminder = reminder; },
                     LocalPosition = new(-20, 0)
                 };
@@ -101,30 +117,22 @@ namespace ValleyReminders
                 };
                 enabledCheck.LocalPosition = new(Width - 40, (reminderListPage.RowHeight - enabledCheck.Height) / 2 -24);
 
-                var deleteButton = new Button(Game1.mouseCursors, new(322, 498, 12, 12), new(48, 48))
+                var deleteButton = new Button(Game1.mouseCursors, new(323, 433, 9, 10))
                 {
                     Callback = (e) => { reminders.Remove(reminder); reminderListDirty = true; },
+                    BoxDraw = false
                 };
                 deleteButton.LocalPosition = new(Width - 40, (reminderListPage.RowHeight - deleteButton.Height) / 2 + 22);
 
                 reminderListPage.AddRow(new Element[] { button, textBox, enabledCheck, deleteButton });
             }
-            var dpicker = new DateTimePicker
-            {
-                GhostInterval = 3
-            };
-            reminderListPage.AddRow(new Element[] { new DateTimePicker() });
             rootElement.AddChild(reminderListPage);
             reminderListDirty = false;
         }
 
-        private void UpdateReminderEditPage(Reminder selectedReminder)
+        private void UpdateEditPage(Reminder selectedReminder)
         {
-            try
-            {
-                rootElement.RemoveChild(reminderEditPage);
-            }
-            catch (ArgumentException) { /* Do nothing */ }
+            rootElement.RemoveChild(reminderEditPage);
 
             reminderEditPage = new()
             {
@@ -246,8 +254,9 @@ namespace ValleyReminders
             reminderEditPage.AddChild(conditions);
 
             //Menu buttons
-            var backButton = new Button(Game1.mouseCursors, new(352, 495, 12, 11), new(48, 44))
+            var backButton = new Button(Game1.mouseCursors, new(352, 495, 12, 11))
             {
+                Size = new(48, 44),
                 LocalPosition = new Vector2(-96, -22),
                 Callback = (e) => { this.selectedReminder = null; }
             };
@@ -256,29 +265,53 @@ namespace ValleyReminders
             rootElement.AddChild(reminderEditPage);
         }
 
+        private void UpdateCreatePage()
+        {
+            rootElement.RemoveChild(reminderCreatePage);
+
+            reminderCreatePage = new()
+            {
+                Size = new(Width, Height),
+                LocalPosition = CenterOffset,
+                OutlineColor = Color.White,
+            };
+
+            var backButton = new Button(Game1.mouseCursors, new(352, 495, 12, 11))
+            {
+                Size = new(48, 44),
+                LocalPosition = new Vector2(-96, -22),
+                Callback = (e) => { newReminder = null; }
+            };
+            reminderCreatePage.AddChild(backButton);
+
+            rootElement.AddChild(reminderCreatePage);
+        }
+
         public override void update(GameTime time)
         {
             base.update(time);
 
+            //Self updating state. Feels a bit messy
             if(selectedReminder != null && state != ReminderMenuState.EDIT)
             {
-                UpdateReminderEditPage(selectedReminder);
+                UpdateEditPage(selectedReminder);
                 state = ReminderMenuState.EDIT;
             }
-            else if (/*TODO*/ state == ReminderMenuState.CREATE)
+            else if (newReminder != null && state != ReminderMenuState.CREATE)
             {
-
+                state = ReminderMenuState.CREATE;
+                UpdateCreatePage();
+                selectedReminder = null;
             }
-            else if (selectedReminder == null)
+            else if (selectedReminder == null && newReminder == null)
             {
-                if (reminderListDirty) { UpdateReminderListPage(); }
+                if (reminderListDirty) { UpdateListPage(); }
                 state = ReminderMenuState.LIST;
             }
 
-
             reminderListPage.Enabled = false;
             reminderEditPage.Enabled = false;
-            reminderCreationPage.Enabled = false;
+            reminderCreatePage.Enabled = false;
 
             switch (state)
             {
@@ -319,7 +352,8 @@ namespace ValleyReminders
                     reminderEditPage.Draw(b);
                     break;
                 case ReminderMenuState.CREATE:
-                    reminderCreationPage.Draw(b);
+                    Console.Write("a");
+                    reminderCreatePage.Draw(b);
                     break;
                 default:
                     break;
