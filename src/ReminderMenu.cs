@@ -284,6 +284,14 @@ namespace ValleyReminders
             };
             reminderCreatePage.AddChild(backButton);
 
+            var createButton = new Button(Game1.mouseCursors, new(341, 410, 23, 9))
+            {
+                Size = new(46, 18),
+                LocalPosition = new Vector2(20, 100),
+                Callback = (e) => { reminders.Add(newReminder!); reminderListDirty = true; newReminder = null; }
+            };
+            reminderCreatePage.AddChild(createButton);
+
             rootElement.AddChild(reminderCreatePage);
         }
 
@@ -294,8 +302,8 @@ namespace ValleyReminders
             //Self updating state. Feels a bit messy
             if(selectedReminder != null && state != ReminderMenuState.EDIT)
             {
-                UpdateEditPage(selectedReminder);
                 state = ReminderMenuState.EDIT;
+                UpdateEditPage(selectedReminder);
             }
             else if (newReminder != null && state != ReminderMenuState.CREATE)
             {
@@ -305,8 +313,8 @@ namespace ValleyReminders
             }
             else if (selectedReminder == null && newReminder == null)
             {
-                if (reminderListDirty) { UpdateListPage(); }
                 state = ReminderMenuState.LIST;
+                if (reminderListDirty) { UpdateListPage(); }
             }
 
             reminderListPage.Enabled = false;
@@ -336,10 +344,6 @@ namespace ValleyReminders
             base.receiveScrollWheelAction(direction);
             reminderListPage.Scrollbar.ScrollBy(direction);
         }
-        public override void receiveLeftClick(int x, int y, bool playSound = true)
-        {
-            base.receiveLeftClick(x, y, playSound);
-        }
 
         public override void draw(SpriteBatch b)
         {
@@ -352,7 +356,6 @@ namespace ValleyReminders
                     reminderEditPage.Draw(b);
                     break;
                 case ReminderMenuState.CREATE:
-                    Console.Write("a");
                     reminderCreatePage.Draw(b);
                     break;
                 default:
