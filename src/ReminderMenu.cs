@@ -171,7 +171,7 @@ namespace ValleyReminders
             };
             const int parameterMargin = 25; //for when condition input will be updated in reverse
 
-            conditions.AddRow(new Element[] { new DateTimePicker() });
+            conditions.AddRow(new Element[] { new DateTimePickerPopup() });
 
             //Display conditions
             foreach (var cond in selectedReminder.Conditions)
